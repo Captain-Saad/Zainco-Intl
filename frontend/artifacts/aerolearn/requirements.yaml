@@ -1,0 +1,18 @@
+packages:
+  "framer-motion": "Required for page transitions, interactive hover states, and data visualizations"
+  "recharts": "Required for student progress and admin dashboard charts"
+  "lucide-react": "Required for aviation and UI icons"
+  "clsx": "Utility for conditional class names"
+  "tailwind-merge": "Utility for safely merging tailwind classes"
+
+images:
+  - path: "artifacts/aerolearn/public/images/cockpit-abstract.png"
+    description: "Abstract, dark, moody representation of a modern glass cockpit or radar screen with subtle gold and cyan blue technical overlays. Minimalist and luxurious."
+    aspect_ratio: "16:9"
+  - path: "artifacts/aerolearn/public/images/a320-wireframe.png"
+    description: "Blueprint or wireframe style technical drawing of an A320 commercial jet on a dark navy background with glowing gold accents. Very technical and premium."
+    aspect_ratio: "16:9"
+
+notes:
+  - App relies purely on localStorage and mockData. No backend API calls are made.
+  - Strictly dark mode application.

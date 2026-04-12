@@ -1,0 +1,60 @@
+# ═══════════════════════════════════════════
+# Python / Backend
+# ═══════════════════════════════════════════
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+*.egg
+venv/
+.venv/
+env/
+.env
+*.db
+*.sqlite3
+
+# Test output logs
+test_out*.txt
+test_passlib.txt
+error.txt
+
+# Uploaded user content (recreated at runtime)
+backend/quiz-files/
+backend/videos/
+backend/images/
+backend/backend/
+
+# Alembic migration cache
+alembic/__pycache__/
+
+# ═══════════════════════════════════════════
+# Node / Frontend
+# ═══════════════════════════════════════════
+node_modules/
+dist/
+.local/
+*.log
+ts_errors.log
+.replit-artifact/
+
+# Lock files (keep pnpm-lock, ignore npm)
+package-lock.json
+
+# ═══════════════════════════════════════════
+# IDE / OS
+# ═══════════════════════════════════════════
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ═══════════════════════════════════════════
+# Gemini / Agent metadata
+# ═══════════════════════════════════════════
+.gemini/
+.agents/
+.agent/

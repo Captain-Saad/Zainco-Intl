@@ -1,0 +1,26 @@
+{
+  "name": "Zainco International",
+  "short_name": "AeroLearn",
+  "description": "Pakistan's Premier A-320 MCC & JOC Preparation Program",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#040D1A",
+  "theme_color": "#C9A84C",
+  "icons": [
+    {
+      "src": "/images/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "productivity"],
+  "screenshots": []
+}

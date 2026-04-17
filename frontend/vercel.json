@@ -1,5 +1,23 @@
 {
   "framework": null,
   "buildCommand": "pnpm --filter @workspace/aerolearn build",
-  "outputDirectory": "artifacts/aerolearn/dist/public"
+  "outputDirectory": "artifacts/aerolearn/dist/public",
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://zainco-intl.onrender.com/api/:path*"
+    },
+    {
+      "source": "/quiz-files/:path*",
+      "destination": "https://zainco-intl.onrender.com/quiz-files/:path*"
+    },
+    {
+      "source": "/images/:path*",
+      "destination": "https://zainco-intl.onrender.com/images/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
 }

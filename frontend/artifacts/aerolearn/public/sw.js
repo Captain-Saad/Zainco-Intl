@@ -5,8 +5,8 @@ const STATIC = [
   '/images/logo.png',
 ];
 
-// Backend API server — used to proxy /api/ requests in standalone PWA mode
-const API_BACKEND = 'http://127.0.0.1:8000';
+// Backend API server — in production, use same origin (Vercel rewrites handle proxying)
+const API_BACKEND = self.location.origin;
 
 self.addEventListener('install', (e) => {
   e.waitUntil(

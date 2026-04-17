@@ -7,6 +7,7 @@ from app.core.config import get_settings
 
 settings = get_settings()
 
+import uuid
 from sqlalchemy import NullPool
 
 engine = create_async_engine(
@@ -15,7 +16,7 @@ engine = create_async_engine(
     poolclass=NullPool,
     connect_args={
         "statement_cache_size": 0,
-        "prepared_statement_cache_size": 0,
+        "prepared_statement_name_func": lambda: f"__asyncpg_{uuid.uuid4().hex}__",
     },
 )
 

@@ -111,7 +111,7 @@ export default function CourseDetail() {
               <div className="mt-8 mb-6 space-y-4 text-left">
                 <div className="flex justify-between border-b border-border/50 pb-2">
                   <span className="text-muted-foreground">Instructor</span>
-                  <span className="font-semibold">{course.instructor || 'Zainco Intl'}</span>
+                  <span className="font-semibold">{course.instructor || 'Capt. Zainul Abidin'}</span>
                 </div>
                 <div className="flex justify-between border-b border-border/50 pb-2">
                   <span className="text-muted-foreground">Total Lessons</span>

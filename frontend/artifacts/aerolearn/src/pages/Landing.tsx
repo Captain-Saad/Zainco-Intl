@@ -220,14 +220,7 @@ export default function Landing() {
         <div className="max-w-3xl mx-auto px-6 text-center">
           <h2 className="text-4xl font-display font-bold mb-12">LEARN FROM THE BEST</h2>
           <div className="glass-card p-10 rounded-2xl border-t-4 border-t-primary inline-block w-full">
-            <div className="w-32 h-32 mx-auto rounded-full border-4 border-primary p-1 mb-6">
-              {/* placeholder instructor portrait Unsplash */}
-              <img 
-                src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop" 
-                alt="Lead Instructor"
-                className="w-full h-full rounded-full object-cover grayscale hover:grayscale-0 transition-all duration-500"
-              />
-            </div>
+
             <h3 className="text-3xl font-display font-bold mb-2">Capt. Zainul Abidin</h3>
             <p className="text-accent font-mono mb-6">LEAD FLIGHT INSTRUCTOR</p>
             <div className="flex flex-wrap justify-center gap-4 text-sm text-muted-foreground">

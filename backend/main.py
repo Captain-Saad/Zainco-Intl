@@ -49,6 +49,7 @@ import os
 
 # Mount static files for uploaded images
 os.makedirs("images", exist_ok=True)
+os.makedirs("videos", exist_ok=True)
 app.mount("/images", StaticFiles(directory="images"), name="images")
 
 os.makedirs("quiz-files", exist_ok=True)

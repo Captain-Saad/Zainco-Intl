@@ -35,7 +35,7 @@ export function Navbar() {
           : "bg-transparent"
       )}
     >
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <div className="w-[92%] max-w-[1800px] mx-auto flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
           <img src={`${import.meta.env.BASE_URL}images/logo.png`} alt="Zainco Logo" className="w-16 h-16 md:w-[72px] md:h-[72px] object-contain group-hover:scale-105 transition-transform shrink-0" />

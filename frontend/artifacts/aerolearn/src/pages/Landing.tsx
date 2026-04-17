@@ -59,7 +59,7 @@ export default function Landing() {
           <div className="radar-bg" />
         </div>
 
-        <div className="max-w-7xl mx-auto px-6 relative z-10 w-full grid lg:grid-cols-2 gap-12 items-center">
+        <div className="w-[92%] max-w-[1800px] mx-auto px-6 relative z-10 grid lg:grid-cols-2 gap-12 items-center">
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -115,7 +115,7 @@ export default function Landing() {
 
       {/* Stats Strip */}
       <div className="w-full bg-secondary border-y border-border-gold relative z-20">
-        <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="w-[92%] max-w-[1800px] mx-auto px-6 py-10 grid grid-cols-2 md:grid-cols-4 gap-8">
           {[
             { value: "50 HRS", label: "Simulator Training" },
             { value: "10", label: "Exclusive Seats" },
@@ -139,7 +139,7 @@ export default function Landing() {
 
       {/* Programs Section */}
       <section id="program" className="py-32 relative">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="w-[92%] max-w-[1800px] mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-display font-bold mb-4">TRAINING MODULES</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">Comprehensive curriculum designed by active airline captains to bridge the gap between basic flight training and commercial jet operations.</p>
@@ -175,7 +175,7 @@ export default function Landing() {
 
       {/* Highlights ZigZag */}
       <section className="py-20 bg-secondary/50 border-t border-border-gold/50 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="w-[92%] max-w-[1800px] mx-auto px-6">
           {[
             { num: "01", course: courses.find(c => c.id === '1'), align: "left", image: "mcc-pilots.jpg" },
             { num: "02", course: courses.find(c => c.id === '2'), align: "right", image: "joc-airplane.png" },
@@ -243,7 +243,7 @@ export default function Landing() {
 
       {/* Footer */}
       <footer className="bg-[#020810] pt-16 pb-8 border-t border-primary/20">
-        <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-12 mb-12">
+        <div className="w-[92%] max-w-[1800px] mx-auto px-6 grid md:grid-cols-3 gap-12 mb-12">
           <div>
             <div className="flex items-center gap-2 mb-4">
               <img src={`${import.meta.env.BASE_URL}images/logo.png`} alt="Zainco Logo" className="w-14 h-14 object-contain" />
@@ -271,7 +271,7 @@ export default function Landing() {
             </div>
           </div>
         </div>
-        <div className="max-w-7xl mx-auto px-6 pt-8 border-t border-white/5 text-center text-xs text-muted-foreground">
+        <div className="w-[92%] max-w-[1800px] mx-auto px-6 pt-8 border-t border-white/5 text-center text-xs text-muted-foreground">
           © {new Date().getFullYear()} Zainco International Aviation Academy. All rights reserved.
         </div>
       </footer>

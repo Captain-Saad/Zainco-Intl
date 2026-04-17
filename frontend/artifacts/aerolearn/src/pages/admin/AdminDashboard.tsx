@@ -66,7 +66,7 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-background flex">
       <Sidebar />
-      <main className="flex-1 md:ml-64 px-4 pt-16 pb-8 md:p-10 max-w-7xl w-full">
+      <main className="flex-1 md:ml-64 px-4 pt-16 pb-8 md:p-10 max-w-[1800px] w-full">
         <header className="mb-8 md:mb-10 flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4">
           <div>
             <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground">SYSTEM OVERVIEW</h1>

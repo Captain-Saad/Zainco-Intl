@@ -7,13 +7,16 @@ from app.core.config import get_settings
 
 settings = get_settings()
 
+from sqlalchemy import NullPool
+
 engine = create_async_engine(
     settings.database_url,
     echo=settings.environment == "development",
-    pool_pre_ping=True,
-    pool_size=5,
-    max_overflow=10,
-    connect_args={"statement_cache_size": 0},
+    poolclass=NullPool,
+    connect_args={
+        "statement_cache_size": 0,
+        "prepared_statement_cache_size": 0,
+    },
 )
 
 async_session_factory = async_sessionmaker(

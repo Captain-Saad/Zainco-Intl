@@ -3,6 +3,7 @@
 from functools import lru_cache
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import field_validator
 
 
 class Settings(BaseSettings):
@@ -16,6 +17,17 @@ class Settings(BaseSettings):
 
     # Database
     database_url: str = "postgresql+asyncpg://postgres:password@localhost:5432/aerolearn"
+
+    @field_validator("database_url", mode="before")
+    @classmethod
+    def assemble_db_connection(cls, v: str | None) -> str:
+        """Ensure database URL uses asyncpg for async SQLAlchemy."""
+        if isinstance(v, str):
+            if v.startswith("postgres://"):
+                return v.replace("postgres://", "postgresql+asyncpg://", 1)
+            elif v.startswith("postgresql://"):
+                return v.replace("postgresql://", "postgresql+asyncpg://", 1)
+        return v or "postgresql+asyncpg://postgres:password@localhost:5432/aerolearn"
 
     # JWT
     secret_key: str = "dev-secret-key-change-in-production-minimum-32-chars"

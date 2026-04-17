@@ -45,10 +45,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+import os
+
 # Mount static files for uploaded images
+os.makedirs("images", exist_ok=True)
 app.mount("/images", StaticFiles(directory="images"), name="images")
 
-import os
 os.makedirs("quiz-files", exist_ok=True)
 app.mount("/quiz-files", StaticFiles(directory="quiz-files"), name="quiz-files")
 

@@ -39,9 +39,20 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  // For non-API GET requests: cache-first strategy
+  // For non-API GET requests
   if (e.request.method !== 'GET') return;
 
+  // Handle navigation requests (SPA routing)
+  if (e.request.mode === 'navigate') {
+    e.respondWith(
+      fetch(e.request).catch(() => {
+        return caches.match('/');
+      })
+    );
+    return;
+  }
+
+  // Regular asset requests: Cache-first
   e.respondWith(
     caches.match(e.request).then(
       (cached) => cached || fetch(e.request)

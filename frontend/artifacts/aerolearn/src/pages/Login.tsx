@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Plane, AlertCircle } from "lucide-react";
+import { Plane, AlertCircle, Eye, EyeOff } from "lucide-react";
 import { Input } from "@/components/shared/Input";
 import { Button } from "@/components/shared/Button";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "wouter";
 
 export default function Login() {
-  const [email, setEmail] = useState("student@zainco.pk");
-  const [password, setPassword] = useState("pilot123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
@@ -57,15 +58,24 @@ export default function Login() {
             required
             className={error ? "border-destructive" : ""}
           />
-          <Input 
-            id="password"
-            label="Password" 
-            type="password" 
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className={error ? "border-destructive" : ""}
-          />
+          <div className="relative">
+            <Input 
+              id="password"
+              label="Password" 
+              type={showPassword ? "text" : "password"} 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className={error ? "border-destructive pr-10" : "pr-10"}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-3.5 text-muted-foreground hover:text-foreground transition-colors z-10 focus:outline-none"
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
 
           {error && (
             <div className="flex items-center gap-2 text-destructive text-sm font-mono bg-destructive/10 p-3 rounded">
@@ -87,10 +97,6 @@ export default function Login() {
           </Button>
         </form>
 
-        <div className="mt-8 pt-6 border-t border-border/50 text-center font-mono text-xs text-muted-foreground space-y-2">
-          <p>Demo Student: student@zainco.pk / pilot123</p>
-          <p>Demo Admin: admin@zainco.pk / admin123</p>
-        </div>
       </motion.div>
 
       <Link href="/">

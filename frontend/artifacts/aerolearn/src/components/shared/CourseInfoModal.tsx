@@ -84,57 +84,21 @@ export default function CourseInfoModal({ course, onClose }: CourseInfoModalProp
                 backgroundImage: `linear-gradient(to bottom, rgba(7,20,40,0.3) 0%, rgba(7,20,40,0.95) 100%), ${
                   course.id === '1' ? `url(${import.meta.env.BASE_URL}images/mcc-pilots.jpg)` :
                   course.id === '2' ? `url(${import.meta.env.BASE_URL}images/joc-airplane.png)` :
+                  course.id === '3' ? `url(${import.meta.env.BASE_URL}images/cockpit-abstract.png)` :
                   course.id === '4' ? `url(${import.meta.env.BASE_URL}images/sim-cockpit.jpg)` :
                   'linear-gradient(135deg, #0A1F3D, #071428)'
                 }` 
               }}
             >
               <div className="px-6 sm:px-8 pb-6">
-                <span className="text-[10px] tracking-[0.2em] uppercase font-mono px-2.5 py-1 rounded bg-[#C9A84C]/10 border-[0.5px] border-[#C9A84C]/30 text-[#C9A84C] mb-3 inline-block">
-                  {course.category} Certification
-                </span>
                 <h2 className="font-display font-medium text-2xl sm:text-3xl text-[#F0F4F8] leading-tight">
                   {course.title}
                 </h2>
-                <p className="text-[13px] text-[#8BA3C1] mt-1.5 flex items-center gap-1.5 font-sans">
-                  <span className="opacity-60">Instructor:</span>
-                  <span className="font-medium text-[#C8D8E8]">{course.instructor}</span>
-                </p>
-              </div>
-            </div>
-
-            {/* Stats Row */}
-            <div className="px-6 sm:px-8">
-              <div className="grid grid-cols-2 sm:flex sm:items-center sm:justify-between py-2 overflow-hidden">
-                <div className="flex flex-col items-center gap-0.5 px-4 py-4 sm:py-6 sm:flex-1 border-r sm:border-r border-white/5 last:border-0 max-sm:odd:border-b">
-                  <span className="font-mono text-[1.2rem] sm:text-[1.4rem] font-medium text-[#0EA5E9] leading-none">
-                    {course.lessons_list.length}
-                  </span>
-                  <span className="text-[10px] text-[#4A6380] uppercase tracking-[0.12em] text-center">Lessons</span>
-                </div>
-                <div className="flex flex-col items-center gap-0.5 px-4 py-4 sm:py-6 sm:flex-1 border-r sm:border-r border-white/5 last:border-0 max-sm:even:border-b">
-                  <span className="font-mono text-[1.2rem] sm:text-[1.4rem] font-medium text-[#0EA5E9] leading-none">
-                    {course.duration}
-                  </span>
-                  <span className="text-[10px] text-[#4A6380] uppercase tracking-[0.12em] text-center">Total Time</span>
-                </div>
-                <div className="flex flex-col items-center gap-0.5 px-4 py-4 sm:py-6 sm:flex-1 sm:border-r border-white/5 last:border-0 border-r max-sm:odd:border-none">
-                  <span className="font-mono text-[1.2rem] sm:text-[1.4rem] font-medium text-[#0EA5E9] leading-none">
-                    {course.students}
-                  </span>
-                  <span className="text-[10px] text-[#4A6380] uppercase tracking-[0.12em] text-center">Enrolled</span>
-                </div>
-                <div className="flex flex-col items-center gap-0.5 px-4 py-4 sm:py-6 sm:flex-1 last:border-0">
-                  <span className="font-mono text-[1.2rem] sm:text-[1.4rem] font-medium text-[#0EA5E9] leading-none">
-                    10 Seats
-                  </span>
-                  <span className="text-[10px] text-[#4A6380] uppercase tracking-[0.12em] text-center">Available</span>
-                </div>
               </div>
             </div>
 
             {/* Gold Divider */}
-            <div className="h-[0.5px] bg-[#C9A84C]/15 mx-6 sm:mx-8 mb-6" />
+            <div className="h-[0.5px] bg-[#C9A84C]/15 mx-6 sm:mx-8 mb-6 mt-4" />
 
             {/* Content Body */}
             <div className="px-6 sm:px-8 pb-10 space-y-8">
@@ -195,22 +159,6 @@ export default function CourseInfoModal({ course, onClose }: CourseInfoModalProp
                 </div>
               </section>
 
-              {/* Instructor Section */}
-              <section>
-                <div className="flex items-center gap-3 mb-4">
-                  <h3 className="text-[11px] tracking-[0.2em] uppercase text-[#C9A84C] whitespace-nowrap">Instructor</h3>
-                  <div className="flex-1 h-[0.5px] bg-[#C9A84C]/20" />
-                </div>
-                <div className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.03] border-[0.5px] border-white/5">
-                  <div className="w-12 h-12 shrink-0 rounded-full bg-gradient-to-br from-[#0A1F3D] to-[#071428] border-[1.5px] border-[#C9A84C]/30 flex items-center justify-center shadow-lg">
-                    <span className="font-medium text-[#C9A84C] text-[15px]">{getInitials(course.instructor)}</span>
-                  </div>
-                  <div>
-                    <h4 className="text-[14px] font-medium text-[#F0F4F8]">{course.instructor}</h4>
-                    <p className="text-[12px] text-[#8BA3C1]">Lead Instructor · A-320 Type Rated</p>
-                  </div>
-                </div>
-              </section>
             </div>
           </div>
 
@@ -218,8 +166,7 @@ export default function CourseInfoModal({ course, onClose }: CourseInfoModalProp
           <div className="relative z-10 sticky bottom-0 bg-gradient-to-t from-[#071428] via-[#071428] to-transparent pt-8 px-6 sm:px-8 pb-6 sm:pb-8">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
               <div className="text-center sm:text-left">
-                <p className="text-[12px] text-[#4A6380] mb-0.5">Ready to begin your training?</p>
-                <p className="text-[11px] text-[#C9A84C] tracking-[0.1em] font-medium uppercase font-mono">Limited — 10 seats only</p>
+                <p className="text-[12px] text-[#4A6380]">Ready to begin your training?</p>
               </div>
               <div className="flex flex-col-reverse sm:flex-row items-center gap-3 w-full sm:w-auto">
                 <button

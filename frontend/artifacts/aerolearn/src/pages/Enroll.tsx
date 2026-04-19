@@ -77,7 +77,7 @@ const faqs = [
   },
   {
     q: "Is the training conducted online or in-person?",
-    a: "Zainco International is a blended learning platform. Theory, video lectures, and assessments are conducted online via this portal. Simulator sessions (where applicable) are conducted at Jinnah International Airport, Karachi.",
+    a: "Zainco International is a blended learning platform. Theory, video lectures, and assessments are conducted online via this portal. Simulator sessions (where applicable) are conducted at Allama Iqbal International Airport Lahore.",
   },
   {
     q: "How long does enrollment take?",
@@ -370,7 +370,7 @@ export default function Enroll() {
               <Mail size={16} className="text-primary" /> zainco747@gmail.com
             </a>
             <span className="flex items-center gap-2 text-muted-foreground">
-              <MapPin size={16} className="text-primary" /> Jinnah Intl Airport, KHI
+              <MapPin size={16} className="text-primary" /> Allama Iqbal International Airport Lahore
             </span>
           </div>
         </div>
@@ -379,7 +379,7 @@ export default function Enroll() {
       {/* Footer mini */}
       <div className="border-t border-border/30 py-6 text-center text-xs text-muted-foreground font-mono">
         © {new Date().getFullYear()} Zainco International Aviation Academy.
-        <Link href="/login" className="text-primary hover:underline ml-3">Student Login →</Link>
+        <Link href="/login" className="text-primary hover:underline ml-3">Login Zainco Intl →</Link>
       </div>
     </div>
   );

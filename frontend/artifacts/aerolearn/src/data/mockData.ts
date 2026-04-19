@@ -89,7 +89,7 @@ export const courses: Course[] = [
   { 
     id: '3', 
     title: 'A-320 Procedures & Systems', 
-    description: 'A comprehensive deep-dive into every Airbus A-320 aircraft system, limitation, and procedure. This module builds the technical knowledge base required to pass your type rating oral examination and operate confidently on line.', 
+    description: 'A comprehensive deep-dive into every Airbus A-320 aircraft system, limitation, and procedure in videos. This module builds the technical knowledge base required to pass your type rating oral examination and operate confidently on line.', 
     lessons: 15, 
     duration: '45 hrs', 
     progress: 0, 
@@ -126,7 +126,7 @@ export const courses: Course[] = [
   { 
     id: '4', 
     title: 'Simulator Briefings & Debriefs', 
-    description: '50 hours of structured simulator sessions in a full-motion Airbus A-320 FFS. Each session is preceded by a detailed briefing and followed by a structured debrief. Designed to build confidence, consistency, and airline-standard performance before your type rating.', 
+    description: '50 hours of structured simulator sessions in FTD. Each session is preceded by a detailed briefing and followed by a structured debrief. Designed to build confidence, consistency, and airline-standard performance before your type rating.', 
     lessons: 6, 
     duration: '12 hrs', 
     progress: 100, 
@@ -147,8 +147,7 @@ export const courses: Course[] = [
       "Normal procedure flows — departure, cruise, approach, landing",
       "Instrument approaches — ILS, RNAV, and circling",
       "Engine failure and asymmetric handling at all flight phases",
-      "Post-session debrief with performance review and areas of focus",
-      "Full motion platform exposure — spatial awareness training"
+      "Post-session debrief with performance review and areas of focus"
     ]
   },
 ];

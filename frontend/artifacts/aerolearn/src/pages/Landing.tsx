@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Users, Plane, BookOpen, ChevronRight, CheckCircle2 } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Button } from "@/components/shared/Button";
@@ -8,6 +8,7 @@ import { courses, Course } from "@/data/mockData";
 import CourseInfoModal from "@/components/shared/CourseInfoModal";
 
 export default function Landing() {
+  const [, setLocation] = useLocation();
   const [altitude, setAltitude] = useState(0);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
 
@@ -60,27 +61,42 @@ export default function Landing() {
         </div>
 
         <div className="w-[92%] max-w-[1800px] mx-auto px-6 relative z-10 grid lg:grid-cols-2 gap-12 items-center">
-          <motion.div
+          <motion.div 
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
-            className="mt-24 lg:mt-0"
+            className="mt-16 lg:mt-0"
           >
-            <div className="inline-block mb-6 px-4 py-1.5 rounded-full border border-primary/30 bg-primary/10 text-primary text-sm font-mono tracking-widest animate-pulse">
-              LIMITED — 10 SEATS ONLY
-            </div>
-            <h1 className="text-5xl md:text-7xl font-display font-bold leading-tight mb-6">
+
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold leading-tight mb-4">
               ELEVATE YOUR <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/60">AVIATION CAREER</span>
+              <span className="block text-xl md:text-2xl lg:text-3xl mt-2 font-medium tracking-wide text-foreground/90">
+                With Our Comprehensive <br className="md:hidden" />
+                <span className="text-accent text-glow-blue font-bold">Preparation Program!</span>
+              </span>
             </h1>
-            <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-xl leading-relaxed">
-              Pakistan's Premier A-320 MCC & JOC Preparation Program. Transition seamlessly from CPL to the airline flight deck.
+            <p className="text-base md:text-lg text-muted-foreground mb-6 max-w-xl leading-relaxed">
+              Are you a Commercial Pilot License holder looking to join an airline that operates A-320 aircraft? We understand the challenges of gaining the necessary experience and training. That's why we're excited to introduce our Multi Crew Cooperation (MCC) and Jet Orientation Course (JOC), preparation program specifically designed for aspiring pilots in Pakistan.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Link href="/enroll">
-                <Button size="lg" className="font-display tracking-widest">ENROLL NOW</Button>
-              </Link>
-              <Button variant="secondary" size="lg" className="font-display tracking-widest">VIEW PROGRAM</Button>
+              <Button 
+                size="lg" 
+                className="font-display tracking-widest"
+                onClick={() => setLocation("/enroll")}
+              >
+                ENROLL NOW
+              </Button>
+              <Button 
+                variant="secondary" 
+                size="lg" 
+                className="font-display tracking-widest"
+                onClick={() => {
+                  document.getElementById("program")?.scrollIntoView({ behavior: "smooth" });
+                }}
+              >
+                VIEW PROGRAM
+              </Button>
             </div>
           </motion.div>
 
@@ -113,36 +129,58 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Stats Strip */}
-      <div className="w-full bg-secondary border-y border-border-gold relative z-20">
-        <div className="w-[92%] max-w-[1800px] mx-auto px-6 py-10 grid grid-cols-2 md:grid-cols-4 gap-8">
-          {[
-            { value: "50 HRS", label: "Simulator Training" },
-            { value: "10", label: "Exclusive Seats" },
-            { value: "A-320", label: "Type Certified" },
-            { value: "CPL", label: "Focused Curriculum" }
-          ].map((stat, i) => (
-            <motion.div 
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className="text-center border-r border-border last:border-0"
-            >
-              <div className="text-3xl md:text-4xl font-mono text-accent text-glow-blue mb-2">{stat.value}</div>
-              <div className="text-sm text-muted-foreground uppercase tracking-wider">{stat.label}</div>
-            </motion.div>
-          ))}
+      {/* What We Offer Section */}
+      <section className="bg-secondary/30 border-y border-border-gold/50 relative z-20 py-24 overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent pointer-events-none" />
+        <div className="w-[92%] max-w-[1800px] mx-auto px-6">
+          <div className="text-center mb-16 relative z-10">
+            <h2 className="text-4xl font-display font-bold mb-4 tracking-wide uppercase">What We Offer</h2>
+            <div className="w-24 h-1 bg-gradient-to-r from-transparent via-primary to-transparent mx-auto opacity-50" />
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 relative z-10">
+            {[
+              {
+                title: "MCC and JOC Preparation",
+                desc: "Gain essential skills needed for successful multi-crew operations.",
+                icon: Users
+              },
+              {
+                title: "A-320 Procedure Training",
+                desc: "Specialized training tailored specifically for the A-320 Procedure.",
+                icon: BookOpen
+              },
+              {
+                title: "Multi-Crew Simulator Training",
+                desc: "50 hours of Simulator Practice Sessions: Get hands-on experience in a controlled environment, enhancing your confidence and competence.",
+                icon: Plane
+              }
+            ].map((offer, i) => (
+              <motion.div 
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="glass-card p-8 rounded-2xl border border-primary/20 hover:border-primary/50 transition-all hover:-translate-y-1 group"
+              >
+                <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <offer.icon size={28} className="text-primary drop-shadow-[0_0_8px_rgba(201,168,76,0.6)]" />
+                </div>
+                <h3 className="text-xl font-display font-bold mb-3 text-glow-gold">{offer.title}</h3>
+                <p className="text-muted-foreground leading-relaxed text-sm">{offer.desc}</p>
+              </motion.div>
+            ))}
+          </div>
         </div>
-      </div>
+      </section>
 
       {/* Programs Section */}
       <section id="program" className="py-32 relative">
         <div className="w-[92%] max-w-[1800px] mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-display font-bold mb-4">TRAINING MODULES</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">Comprehensive curriculum designed by active airline captains to bridge the gap between basic flight training and commercial jet operations.</p>
+            <p className="text-muted-foreground max-w-2xl mx-auto">Comprehensive curriculum designed by airline captains to bridge the gap between basic flight training and commercial jet operations.</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">

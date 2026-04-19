@@ -52,12 +52,6 @@ export function Navbar() {
           >
             PROGRAMS
           </button>
-          <button
-            onClick={() => scrollToSection("instructors")}
-            className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-          >
-            INSTRUCTORS
-          </button>
           <Link href="/login">
             <Button variant="ghost" className="text-foreground">
               Sign In
@@ -86,12 +80,6 @@ export function Navbar() {
             className="px-4 py-3 text-sm font-medium text-muted-foreground hover:text-primary transition-colors rounded-lg hover:bg-white/5 text-left"
           >
             PROGRAMS
-          </button>
-          <button
-            onClick={() => scrollToSection("instructors")}
-            className="px-4 py-3 text-sm font-medium text-muted-foreground hover:text-primary transition-colors rounded-lg hover:bg-white/5 text-left"
-          >
-            INSTRUCTORS
           </button>
           <div className="flex flex-col gap-3 px-4 pt-3 mt-1 border-t border-border/30">
             <Link href="/login" onClick={() => setMobileMenuOpen(false)}>

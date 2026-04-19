@@ -253,24 +253,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Instructor Section */}
-      <section id="instructors" className="py-32 relative">
-        <div className="max-w-3xl mx-auto px-6 text-center">
-          <h2 className="text-4xl font-display font-bold mb-12">LEARN FROM THE BEST</h2>
-          <div className="glass-card p-10 rounded-2xl border-t-4 border-t-primary inline-block w-full">
 
-            <h3 className="text-3xl font-display font-bold mb-2">Capt. Zainul Abidin</h3>
-            <p className="text-accent font-mono mb-6">LEAD FLIGHT INSTRUCTOR</p>
-            <div className="flex flex-wrap justify-center gap-4 text-sm text-muted-foreground">
-              <span>ATPL Holder</span>
-              <span className="text-primary">•</span>
-              <span>8,500+ Flight Hours</span>
-              <span className="text-primary">•</span>
-              <span>A-320 Type Rated</span>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Footer */}
       <footer className="bg-[#020810] pt-16 pb-8 border-t border-primary/20">
@@ -289,7 +272,6 @@ export default function Landing() {
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li><a href="#program" className="hover:text-primary transition-colors">Program Details</a></li>
               <li><Link href="/enroll" className="hover:text-primary transition-colors">Admissions</Link></li>
-              <li><a href="#instructors" className="hover:text-primary transition-colors">Instructors</a></li>
               <li><Link href="/login" className="hover:text-primary transition-colors">Student Portal</Link></li>
             </ul>
           </div>

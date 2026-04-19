@@ -32,7 +32,7 @@ export const courses: Course[] = [
     category: 'MCC', 
     status: 'in-progress', 
     students: 47, 
-    instructor: 'Capt. Zainul Abidin', 
+    instructor: 'Lead Instructor', 
     lessons_list: [
       { id: 'l1', title: 'Introduction to Multi-Crew Operations', duration: '45 min', completed: true, locked: false },
       { id: 'l2', title: 'Crew Resource Management Fundamentals', duration: '60 min', completed: true, locked: false },
@@ -66,7 +66,7 @@ export const courses: Course[] = [
     category: 'JOC', 
     status: 'in-progress', 
     students: 39, 
-    instructor: 'Capt. Zainul Abidin', 
+    instructor: 'Lead Instructor', 
     lessons_list: [
       { id: 'j1', title: 'Jet Aerodynamics & High-Speed Flight', duration: '60 min', completed: true, locked: false },
       { id: 'j2', title: 'High-Altitude Operations & Pressurization', duration: '55 min', completed: true, locked: false },
@@ -96,7 +96,7 @@ export const courses: Course[] = [
     category: 'Type', 
     status: 'not-started', 
     students: 28, 
-    instructor: 'Capt. Zainul Abidin', 
+    instructor: 'Lead Instructor', 
     lessons_list: [
       { id: 'a1', title: 'A-320 Airframe & Powerplant', duration: '60 min', completed: false, locked: false },
       { id: 'a2', title: 'Flight Controls & EFCS', duration: '75 min', completed: false, locked: true },
@@ -133,7 +133,7 @@ export const courses: Course[] = [
     category: 'SIM', 
     status: 'completed', 
     students: 52, 
-    instructor: 'Capt. Zainul Abidin', 
+    instructor: 'Lead Instructor', 
     lessons_list: [
       { id: 's1', title: 'Simulator Orientation & Controls', duration: '30 min', completed: true, locked: false },
       { id: 's2', title: 'Normal Procedures Simulator Briefing', duration: '45 min', completed: true, locked: false },

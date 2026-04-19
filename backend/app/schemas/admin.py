@@ -76,3 +76,31 @@ class AdminGraphsResponse(BaseModel):
 
 class UpdateStudentStatusRequest(BaseModel):
     is_active: bool
+
+
+# ── Enrollment Inquiry schemas ──────────────────────────────────────
+
+class EnrollmentInquiryCreate(BaseModel):
+    name: str
+    email: str
+    phone: str
+    license_number: str
+    message: Optional[str] = ""
+
+
+class EnrollmentInquiryResponse(BaseModel):
+    id: UUID
+    name: str
+    email: str
+    phone: str
+    license_number: str
+    message: Optional[str] = ""
+    status: str
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class EnrollmentInquiryStatusUpdate(BaseModel):
+    status: str  # "new" | "reviewed" | "contacted"
+

@@ -14,6 +14,10 @@ from app.api.lessons import router as lessons_router
 from app.api.progress import router as progress_router, activities_router
 from app.api.quizzes import router as quizzes_router
 from app.api.video import router as video_router
+from app.api.enrollment_inquiries import (
+    public_router as inquiry_public_router,
+    admin_router as inquiry_admin_router,
+)
 from app.core.config import get_settings
 import app.models  # load all models for SQLAlchemy registry
 
@@ -65,6 +69,8 @@ app.include_router(progress_router, prefix="/api")
 app.include_router(activities_router, prefix="/api")
 app.include_router(quizzes_router) # Not using prefix, already specified inside router
 app.include_router(video_router, prefix="/api")
+app.include_router(inquiry_public_router, prefix="/api")
+app.include_router(inquiry_admin_router, prefix="/api")
 
 
 @app.get("/api/healthz")

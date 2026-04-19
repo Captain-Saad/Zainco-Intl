@@ -18,6 +18,7 @@ from app.models.quiz import (
     QuizAnswer,
 )
 from app.models.curriculum import CurriculumItem
+from app.models.enrollment_inquiry import EnrollmentInquiry
 
 __all__ = [
     "User",
@@ -34,4 +35,5 @@ __all__ = [
     "QuizSubmission",
     "QuizAnswer",
     "CurriculumItem",
+    "EnrollmentInquiry",
 ]

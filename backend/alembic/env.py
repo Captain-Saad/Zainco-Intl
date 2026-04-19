@@ -22,6 +22,7 @@ from app.models.progress import (  # noqa: F401
     LessonProgress,
     VideoSession,
 )
+from app.models.enrollment_inquiry import EnrollmentInquiry  # noqa: F401
 
 # Alembic Config object
 config = context.config

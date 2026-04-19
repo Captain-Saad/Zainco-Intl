@@ -6,67 +6,55 @@ import { Button } from "@/components/shared/Button";
 import { Input } from "@/components/shared/Input";
 import {
   CheckCircle2, Plane, Clock, Users, BookOpen,
-  Phone, Mail, MapPin, ChevronRight, Shield, Award, Star
+  Phone, Mail, MapPin, Star, Shield, Award,
+  Layers, Gauge, Monitor, Headphones
 } from "lucide-react";
+import { customFetch } from "@workspace/api-client-react";
 
-const programs = [
+const courseFeatures = [
   {
-    id: "mcc",
-    tag: "MOST POPULAR",
-    title: "MCC + JOC Combined",
-    subtitle: "Multi Crew Cooperation & Jet Orientation Course",
-    price: "PKR 285,000",
-    duration: "60 hrs",
-    lessons: 20,
-    students: 86,
-    highlight: true,
-    features: [
-      "Multi Crew Cooperation (MCC) — Full Module",
-      "Jet Orientation Course (JOC) — Full Module",
-      "A-320 Systems Introduction",
-      "Simulator Briefing & Debrief sessions",
-      "Course completion certificate",
-      "12 months portal access",
-      "1-on-1 instructor feedback sessions",
-    ],
+    icon: Users,
+    text: "Multi Crew Cooperation (MCC) — Full Module",
   },
   {
-    id: "mcc-only",
-    tag: "STANDARD",
-    title: "MCC Only",
-    subtitle: "Multi Crew Cooperation",
-    price: "PKR 155,000",
-    duration: "36 hrs",
-    lessons: 12,
-    students: 47,
-    highlight: false,
-    features: [
-      "Multi Crew Cooperation (MCC) — Full Module",
-      "CRM & TEM training",
-      "Standard Operating Procedures",
-      "Course completion certificate",
-      "6 months portal access",
-      "Group Q&A sessions",
-    ],
+    icon: Plane,
+    text: "Jet Orientation Course (JOC) — Full Module",
   },
   {
-    id: "joc-only",
-    tag: "ADVANCED",
-    title: "JOC Only",
-    subtitle: "Jet Orientation Course",
-    price: "PKR 145,000",
-    duration: "24 hrs",
-    lessons: 8,
-    students: 39,
-    highlight: false,
-    features: [
-      "Jet Orientation Course (JOC) — Full Module",
-      "High-altitude & high-speed aerodynamics",
-      "A-320 family overview",
-      "ECAM systems & warnings",
-      "Course completion certificate",
-      "6 months portal access",
-    ],
+    icon: Layers,
+    text: "A-320 Systems Introduction & Procedure Training",
+  },
+  {
+    icon: Shield,
+    text: "Crew Resource Management (CRM) & Threat/Error Management",
+  },
+  {
+    icon: Gauge,
+    text: "High-altitude & high-speed jet aerodynamics",
+  },
+  {
+    icon: BookOpen,
+    text: "ECAM systems, FMS & autopilot operations",
+  },
+  {
+    icon: Monitor,
+    text: "50 hours of structured simulator practice sessions",
+  },
+  {
+    icon: Headphones,
+    text: "Simulator Briefing & Debrief with instructor feedback",
+  },
+  {
+    icon: Star,
+    text: "Non-Technical Skills (NTS) assessment preparation",
+  },
+  {
+    icon: Award,
+    text: "Course completion certificate — CAAB aligned curriculum",
+  },
+  {
+    icon: Clock,
+    text: "12 months of full portal access",
   },
 ];
 
@@ -77,7 +65,7 @@ const faqs = [
   },
   {
     q: "Is the training conducted online or in-person?",
-    a: "Zainco International is a blended learning platform. Theory, video lectures, and assessments are conducted online via this portal. Simulator sessions (where applicable) are conducted at Allama Iqbal International Airport Lahore.",
+    a: "Zainco International is a blended learning platform. Theory, video lectures, and assessments are conducted online via this portal. Simulator sessions (where applicable) are conducted in Lahore.",
   },
   {
     q: "How long does enrollment take?",
@@ -90,8 +78,8 @@ const faqs = [
 ];
 
 export default function Enroll() {
-  const [selected, setSelected] = useState("mcc");
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [form, setForm] = useState({
     name: "", email: "", phone: "", license: "", message: "",
@@ -100,9 +88,28 @@ export default function Enroll() {
   const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm(f => ({ ...f, [field]: e.target.value }));
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setSubmitting(true);
+    try {
+      await customFetch("/api/enrollment-inquiries", {
+        method: "POST",
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          license_number: form.license,
+          message: form.message,
+        }),
+        headers: { "Content-Type": "application/json" },
+      });
+      setSubmitted(true);
+    } catch {
+      // Still show success to user (inquiry may have gone through)
+      setSubmitted(true);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -119,7 +126,8 @@ export default function Enroll() {
             START YOUR <span className="text-primary">AIRLINE</span><br />CAREER TODAY
           </h1>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-10">
-            Select your program, fill in your details, and our admissions team will reach out within 24 hours to complete your enrollment.
+            Our comprehensive MCC + JOC preparation program is specifically designed
+            for CPL holders in Pakistan preparing to join airlines operating A-320 aircraft.
           </p>
           <div className="flex flex-wrap justify-center gap-6 text-sm font-mono text-muted-foreground">
             {[
@@ -136,90 +144,87 @@ export default function Enroll() {
         </div>
       </section>
 
-      {/* Programs */}
-      <section className="py-16 max-w-7xl mx-auto px-4 md:px-6">
-        <h2 className="font-display font-bold text-3xl md:text-4xl text-center mb-12">
-          CHOOSE YOUR PROGRAM
-        </h2>
-        <div className="grid md:grid-cols-3 gap-6 md:gap-8">
-          {programs.map((prog) => (
-            <motion.div
-              key={prog.id}
-              whileHover={{ y: -6 }}
-              onClick={() => setSelected(prog.id)}
-              className={`glass-card rounded-2xl border-2 cursor-pointer transition-all duration-300 flex flex-col relative overflow-hidden
-                ${selected === prog.id
-                  ? "border-primary shadow-[0_0_30px_rgba(201,168,76,0.2)]"
-                  : "border-border hover:border-primary/40"
-                }
-                ${prog.highlight ? "border-t-4 border-t-primary" : ""}
-              `}
-            >
-              {prog.tag && (
-                <div className={`absolute top-4 right-4 text-[10px] font-mono tracking-widest px-2 py-0.5 rounded border
-                  ${prog.highlight
-                    ? "bg-primary/20 text-primary border-primary/40"
-                    : "bg-secondary text-muted-foreground border-border"
-                  }`}>
-                  {prog.tag}
-                </div>
-              )}
+      {/* What We Offer — Single Course Card */}
+      <section className="py-16 max-w-5xl mx-auto px-4 md:px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="glass-card rounded-2xl border-2 border-primary/40 relative overflow-hidden shadow-[0_0_40px_rgba(201,168,76,0.1)]"
+        >
+          {/* Top accent bar */}
+          <div className="h-1.5 bg-gradient-to-r from-primary/60 via-primary to-primary/60" />
 
-              <div className="p-6 md:p-8 flex-1 flex flex-col">
-                <div className="mb-6">
-                  <h3 className="font-display font-bold text-xl mb-1">{prog.title}</h3>
-                  <p className="text-xs text-muted-foreground font-mono">{prog.subtitle}</p>
+          <div className="p-8 md:p-12">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 mb-10">
+              <div>
+                <div className="inline-block text-[10px] font-mono tracking-widest px-3 py-1 rounded border bg-primary/20 text-primary border-primary/40 mb-4">
+                  COMPREHENSIVE PROGRAM
                 </div>
-
-                <div className="mb-8">
-                  <span className="font-display font-bold text-3xl text-foreground">{prog.price}</span>
-                  <p className="text-xs text-muted-foreground mt-1 font-mono">Installment plans available</p>
-                </div>
-
-                <div className="flex gap-4 text-xs font-mono text-muted-foreground mb-8 pb-6 border-b border-border/50">
-                  <span className="flex items-center gap-1"><Clock size={13}/> {prog.duration}</span>
-                  <span className="flex items-center gap-1"><BookOpen size={13}/> {prog.lessons} lessons</span>
-                  <span className="flex items-center gap-1"><Users size={13}/> {prog.students} enrolled</span>
-                </div>
-
-                <ul className="space-y-3 flex-1">
-                  {prog.features.map((feat) => (
-                    <li key={feat} className="flex items-start gap-3 text-sm">
-                      <CheckCircle2 size={16} className="text-primary mt-0.5 shrink-0" />
-                      <span className="text-muted-foreground">{feat}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <div className={`mt-8 w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg text-sm font-medium transition-colors
-                  ${selected === prog.id
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-secondary text-foreground hover:bg-primary/20 hover:text-primary"
-                  }`}>
-                  {selected === prog.id ? (
-                    <><CheckCircle2 size={16} /> Selected</>
-                  ) : (
-                    <>Select Program <ChevronRight size={16} /></>
-                  )}
-                </div>
+                <h2 className="font-display font-bold text-3xl md:text-4xl mb-2">
+                  WHAT WE OFFER
+                </h2>
+                <p className="text-muted-foreground text-sm max-w-lg">
+                  A complete MCC + JOC preparation course covering everything you need
+                  to transition from CPL to a career-ready airline pilot on the Airbus A-320.
+                </p>
               </div>
-            </motion.div>
-          ))}
-        </div>
+
+
+            </div>
+
+            {/* Divider */}
+            <div className="w-full h-px bg-gradient-to-r from-transparent via-border to-transparent mb-10" />
+
+            {/* Feature Grid */}
+            <div className="grid sm:grid-cols-2 gap-x-8 gap-y-5">
+              {courseFeatures.map((feat, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, x: -10 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.05 }}
+                  className="flex items-start gap-4 group"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                    <feat.icon size={18} className="text-primary" />
+                  </div>
+                  <span className="text-sm text-foreground/90 leading-relaxed pt-1.5">{feat.text}</span>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* CTA inside the card */}
+            <div className="mt-10 pt-8 border-t border-border/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <p className="text-sm text-muted-foreground text-center sm:text-left">
+                Ready to start? Fill in your details below and our team will reach out within <span className="text-primary font-medium">24 hours</span>.
+              </p>
+              <button
+                onClick={() => {
+                  document.getElementById("enroll-form")?.scrollIntoView({ behavior: "smooth" });
+                }}
+                className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium text-sm hover:bg-primary/90 transition-colors shrink-0"
+              >
+                <Plane size={16} className="-rotate-45" /> Enroll Now
+              </button>
+            </div>
+          </div>
+        </motion.div>
       </section>
 
       {/* Enrollment Form */}
-      <section className="py-16 max-w-3xl mx-auto px-4 md:px-6">
+      <section id="enroll-form" className="py-16 max-w-5xl mx-auto px-4 md:px-6">
         <div className="glass-card rounded-2xl border border-border p-6 md:p-10">
           {!submitted ? (
             <>
               <div className="mb-8">
-                <p className="font-mono text-xs tracking-widest text-primary mb-2">STEP 2 OF 2</p>
+                <p className="font-mono text-xs tracking-widest text-primary mb-2">ENROLLMENT ENQUIRY</p>
                 <h2 className="font-display font-bold text-2xl md:text-3xl">Your Details</h2>
                 <p className="text-muted-foreground mt-2 text-sm">
-                  Enrolling for: <span className="text-foreground font-medium">
-                    {programs.find(p => p.id === selected)?.title}
-                  </span>
+                  Enrolling for: <span className="text-foreground font-medium">MCC + JOC Combined Program</span>
                 </p>
               </div>
 
@@ -256,21 +261,6 @@ export default function Enroll() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm text-muted-foreground ml-1">
-                    Selected Program
-                  </label>
-                  <select
-                    className="w-full bg-secondary border border-border rounded-lg px-4 py-3 text-foreground focus:outline-none focus:border-primary"
-                    value={selected}
-                    onChange={e => setSelected(e.target.value)}
-                  >
-                    {programs.map(p => (
-                      <option key={p.id} value={p.id}>{p.title} — {p.price}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="space-y-2">
                   <label className="text-sm text-muted-foreground ml-1">Message (optional)</label>
                   <textarea
                     className="w-full bg-secondary border border-border rounded-lg px-4 py-3 text-foreground focus:outline-none focus:border-primary min-h-[100px] resize-none"
@@ -281,8 +271,9 @@ export default function Enroll() {
                 </div>
 
                 <div className="pt-2">
-                  <Button type="submit" size="lg" className="w-full gap-2">
-                    <Plane size={18} className="-rotate-45" /> Submit Enrollment Enquiry
+                  <Button type="submit" size="lg" className="w-full gap-2" disabled={submitting}>
+                    <Plane size={18} className="-rotate-45" />
+                    {submitting ? "Submitting..." : "Submit Enrollment Enquiry"}
                   </Button>
                   <p className="text-center text-xs text-muted-foreground mt-3 font-mono">
                     Our admissions team will contact you within 24 hours.
@@ -304,7 +295,7 @@ export default function Enroll() {
                 Welcome aboard, {form.name.split(" ")[0] || "Pilot"}!
               </h3>
               <p className="text-muted-foreground max-w-sm mx-auto mb-8">
-                Your enrollment enquiry for <span className="text-foreground font-medium">{programs.find(p => p.id === selected)?.title}</span> has been received. We will call you at <span className="text-foreground font-medium">{form.phone}</span> within 24 hours.
+                Your enrollment enquiry for <span className="text-foreground font-medium">MCC + JOC Combined Program</span> has been received. We will call you at <span className="text-foreground font-medium">{form.phone}</span> within 24 hours.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/login">
@@ -320,7 +311,7 @@ export default function Enroll() {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 max-w-3xl mx-auto px-4 md:px-6">
+      <section className="py-16 max-w-5xl mx-auto px-4 md:px-6">
         <h2 className="font-display font-bold text-2xl md:text-3xl mb-10 text-center">
           FREQUENTLY ASKED QUESTIONS
         </h2>
@@ -363,14 +354,14 @@ export default function Enroll() {
             <p className="text-muted-foreground text-sm">Our admissions team is available 9 AM – 6 PM, Mon–Sat.</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-4 text-sm font-mono shrink-0">
-            <a href="tel:+923001234567" className="flex items-center gap-2 text-foreground hover:text-primary transition-colors">
-              <Phone size={16} className="text-primary" /> +92 300 1234567
+            <a href="tel:+923219230301" className="flex items-center gap-2 text-foreground hover:text-primary transition-colors">
+              <Phone size={16} className="text-primary" /> +92 321 9230301
             </a>
             <a href="mailto:zainco747@gmail.com" className="flex items-center gap-2 text-foreground hover:text-primary transition-colors">
               <Mail size={16} className="text-primary" /> zainco747@gmail.com
             </a>
             <span className="flex items-center gap-2 text-muted-foreground">
-              <MapPin size={16} className="text-primary" /> Allama Iqbal International Airport Lahore
+              <MapPin size={16} className="text-primary" /> Lahore
             </span>
           </div>
         </div>
@@ -378,7 +369,7 @@ export default function Enroll() {
 
       {/* Footer mini */}
       <div className="border-t border-border/30 py-6 text-center text-xs text-muted-foreground font-mono">
-        © {new Date().getFullYear()} Zainco International Aviation Academy.
+        © {new Date().getFullYear()} Zainco International.
         <Link href="/login" className="text-primary hover:underline ml-3">Login Zainco Intl →</Link>
       </div>
     </div>

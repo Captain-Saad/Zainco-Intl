@@ -68,15 +68,15 @@ export default function Landing() {
             className="mt-16 lg:mt-0"
           >
 
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold leading-tight mb-4">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold leading-tight mb-3">
               ELEVATE YOUR <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/60">AVIATION CAREER</span>
-              <span className="block text-xl md:text-2xl lg:text-3xl mt-2 font-medium tracking-wide text-foreground/90">
+              <span className="block text-lg md:text-xl lg:text-2xl mt-1 font-medium tracking-wide text-foreground/90">
                 With Our Comprehensive <br className="md:hidden" />
                 <span className="text-accent text-glow-blue font-bold">Preparation Program!</span>
               </span>
             </h1>
-            <p className="text-base md:text-lg text-muted-foreground mb-6 max-w-xl leading-relaxed">
+            <p className="text-sm md:text-base text-muted-foreground mb-6 max-w-xl leading-relaxed">
               Are you a Commercial Pilot License holder looking to join an airline that operates A-320 aircraft? We understand the challenges of gaining the necessary experience and training. That's why we're excited to introduce our Multi Crew Cooperation (MCC) and Jet Orientation Course (JOC), preparation program specifically designed for aspiring pilots in Pakistan.
             </p>
             <div className="flex flex-wrap gap-4">

@@ -593,6 +593,7 @@ export default function SecureVideoPlayer({
           disablePictureInPicture
           disableRemotePlayback
           playsInline
+          preload="auto"
           draggable={false}
           onDragStart={(e) => e.preventDefault()}
           onTimeUpdate={onTimeUpdate}

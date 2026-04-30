@@ -90,3 +90,22 @@ def get_public_url(bucket: str, path: str):
     """Get the public URL for a file in Supabase Storage."""
     supabase = get_supabase()
     return supabase.storage.from_(bucket).get_public_url(path.lstrip("/"))
+
+async def check_supabase_config():
+    """Verify if Supabase is correctly configured and reachable."""
+    try:
+        url = settings.supabase_url or os.environ.get("SUPABASE_URL")
+        key = settings.supabase_key or os.environ.get("SUPABASE_KEY")
+        
+        if not url or not key:
+            return {"status": "error", "message": "Missing SUPABASE_URL or SUPABASE_KEY in environment"}
+            
+        supabase = get_supabase()
+        # Try to list buckets as a connectivity test
+        def _list():
+            return supabase.storage.list_buckets()
+            
+        await anyio.to_thread.run_sync(_list)
+        return {"status": "ok", "url": url}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}

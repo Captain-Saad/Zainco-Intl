@@ -502,3 +502,26 @@ async def delete_student(
     await db.commit()
     return {"message": f"Student {student.email} has been permanently deleted."}
 
+@router.get("/healthz")
+async def system_health(
+    db: AsyncSession = Depends(get_db),
+    admin: User = Depends(require_admin),
+) -> Any:
+    """Check connectivity to all external services."""
+    from app.core.supabase import check_supabase_config
+    
+    # 1. DB Check
+    try:
+        await db.execute(select(1))
+        db_status = "ok"
+    except Exception as e:
+        db_status = f"error: {str(e)}"
+        
+    # 2. Supabase Check
+    supabase_status = await check_supabase_config()
+    
+    return {
+        "database": db_status,
+        "supabase": supabase_status,
+        "environment": os.environ.get("ENVIRONMENT", "unknown")
+    }

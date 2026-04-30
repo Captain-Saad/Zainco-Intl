@@ -253,6 +253,7 @@ export default function SecureVideoPlayer({
   const onTimeUpdate = useCallback(() => {
     const v = videoRef.current;
     if (!v) return;
+    setIsBuffering(false);
     setCurrentTime(v.currentTime);
     // buffered
     if (v.buffered.length > 0) {
@@ -688,7 +689,7 @@ export default function SecureVideoPlayer({
         )}
 
         {/* ── Buffering spinner ── */}
-        {isBuffering && !hasError && (
+        {isBuffering && !hasError && playing && (
           <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', zIndex: 14, pointerEvents: 'none' }}>
             <Spinner />
           </div>

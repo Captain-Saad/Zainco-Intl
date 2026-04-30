@@ -603,6 +603,8 @@ export default function SecureVideoPlayer({
           onPause={() => setPlaying(false)}
           onWaiting={() => setIsBuffering(true)}
           onPlaying={() => setIsBuffering(false)}
+          onCanPlay={() => setIsBuffering(false)}
+          onCanPlayThrough={() => setIsBuffering(false)}
           onError={() => setHasError(true)}
           style={{
             width: '100%',

@@ -26,9 +26,11 @@ function isUrl(input: RequestInfo | URL): input is URL {
 }
 
 function resolveUrl(input: RequestInfo | URL): string {
-  if (typeof input === "string") return input;
-  if (isUrl(input)) return input.toString();
-  return input.url;
+  const url = typeof input === "string" ? input : isUrl(input) ? input.toString() : input.url;
+  if (typeof window !== "undefined" && url.startsWith("/")) {
+    return `${window.location.origin}${url}`;
+  }
+  return url;
 }
 
 function mergeHeaders(...sources: Array<HeadersInit | undefined>): Headers {

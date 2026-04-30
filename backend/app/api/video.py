@@ -123,13 +123,14 @@ async def stream_video(
         # Generate a signed URL that expires in 2 hours
         signed_url = await get_signed_url("videos", filename, expires_in=7200)
     except Exception as e:
-        print(f"Supabase Connection Error: {str(e)}")
-        raise HTTPException(status_code=500, detail="Error connecting to Supabase storage")
+        print(f"ERROR: get_signed_url exception: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Streaming service error: {str(e)}")
         
     if not signed_url:
-        raise HTTPException(status_code=404, detail="Video file not found in Supabase storage")
+        print(f"ERROR: No signed URL generated for {filename}")
+        raise HTTPException(status_code=404, detail=f"Video file '{filename}' not found in storage. Please re-upload.")
         
-    return RedirectResponse(signed_url)
+    return RedirectResponse(url=signed_url)
 
 
 @router.post("/progress", response_model=VideoProgressResponse)

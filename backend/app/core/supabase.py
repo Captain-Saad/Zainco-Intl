@@ -57,11 +57,18 @@ async def get_signed_url(bucket: str, path: str, expires_in: int = 3600):
 
     try:
         res = await anyio.to_thread.run_sync(_get_url)
+        print(f"DEBUG: Supabase response for signed URL: {res}")
         if isinstance(res, str): return res
-        if isinstance(res, dict): return res.get("signedURL") or res.get("signed_url")
+        if isinstance(res, dict): 
+            return res.get("signedURL") or res.get("signed_url") or res.get("url")
+        # Handle cases where it might be an object with these attributes
+        if hasattr(res, "signed_url"): return res.signed_url
+        if hasattr(res, "url"): return res.url
         return None
     except Exception as e:
-        print(f"DEBUG: Signed URL error: {str(e)}")
+        print(f"DEBUG: CRITICAL Signed URL error: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return None
 
 async def delete_file(bucket: str, path: str):

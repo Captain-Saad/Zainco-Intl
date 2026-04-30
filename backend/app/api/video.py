@@ -114,7 +114,11 @@ async def stream_video(
         filename = "sample.mp4"
     else:
         filename = lesson.video_url
-        # Clean up path prefixes if any
+        # If it's a full URL, extract just the filename from the end
+        if "supabase.co" in filename:
+            filename = filename.split("/")[-1]
+            
+        # Clean up other path prefixes if any
         for prefix in ["/videos/", "videos/", "/"]:
             if filename.startswith(prefix):
                 filename = filename.replace(prefix, "", 1)

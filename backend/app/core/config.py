@@ -43,6 +43,10 @@ class Settings(BaseSettings):
     # Environment
     environment: str = "development"
 
+    # Supabase
+    supabase_url: str = ""
+    supabase_key: str = ""
+
     @property
     def cors_origins_list(self) -> list[str]:
         """Parse CORS origins from comma-separated string."""

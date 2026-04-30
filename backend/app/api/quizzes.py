@@ -19,6 +19,7 @@ from app.models.quiz import (
     QuizSubmission,
 )
 from app.models.user import User
+from app.core.supabase import upload_file, get_public_url
 from app.schemas.curriculum import (
     QuizCreate,
     QuizQuestionCreate,
@@ -79,13 +80,13 @@ async def upload_quiz_document(
         
     ext = file.filename.split(".")[-1] if "." in file.filename else "pdf"
     filename = f"{quiz_id.hex}.{ext}"
-    file_path = os.path.join(QUIZ_FILES_DIR, filename)
 
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+    content = await file.read()
+    # Upload to Supabase 'quizzes' bucket
+    await upload_file("quizzes", filename, content, file.content_type)
         
     db_quiz.quiz_mode = "upload"
-    db_quiz.quiz_file_url = f"/quiz-files/{filename}"
+    db_quiz.quiz_file_url = get_public_url("quizzes", filename)
     await db.commit()
     
     # Reload
@@ -258,19 +259,17 @@ async def submit_quiz_document(
     if not (await db.execute(stmt)).scalar_one_or_none():
          raise HTTPException(status_code=404, detail="Quiz not found")
 
-    os.makedirs(os.path.join(QUIZ_FILES_DIR, "submissions"), exist_ok=True)
     ext = file.filename.split(".")[-1] if "." in file.filename else "pdf"
-    filename = f"sub_{quiz_id.hex}_{current_user.id.hex}.{ext}"
-    file_path = os.path.join(QUIZ_FILES_DIR, "submissions", filename)
+    filename = f"submissions/sub_{quiz_id.hex}_{current_user.id.hex}.{ext}"
 
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+    content = await file.read()
+    upload_file("quizzes", filename, content, file.content_type)
 
     db_submission = QuizSubmission(
         quiz_id=quiz_id,
         user_id=current_user.id,
         status="submitted",
-        answer_file_url=f"/quiz-files/submissions/{filename}"
+        answer_file_url=get_public_url("quizzes", filename)
     )
     db.add(db_submission)
     await db.commit()

@@ -28,10 +28,12 @@ class Lesson(Base):
     video_url: Mapped[str | None] = mapped_column(String, nullable=True)
     video_key: Mapped[str | None] = mapped_column(String(500), nullable=True)
     is_locked: Mapped[bool] = mapped_column(Boolean, default=True)
+    is_uploading: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
 
     # Relationships
     course = relationship("Course", back_populates="lessons")
-    progress = relationship("LessonProgress", back_populates="lesson", lazy="selectin")
+    progress = relationship("LessonProgress", back_populates="lesson", lazy="selectin", cascade="all, delete-orphan")
+    video_sessions = relationship("VideoSession", backref="lesson_parent", cascade="all, delete-orphan")

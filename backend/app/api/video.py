@@ -5,12 +5,13 @@ from pathlib import Path
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from fastapi.responses import StreamingResponse
+from fastapi.responses import RedirectResponse
 from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
 from app.core.deps import get_current_user, get_db
+from app.core.supabase import get_signed_url
 from app.models.lesson import Lesson
 from app.models.progress import Activity, Enrollment, LessonProgress, VideoSession
 from app.models.user import User
@@ -80,14 +81,7 @@ async def create_video_token(
     )
 
 
-def send_bytes_range_requests(
-    file_path: str, start: int, end: int, chunk_size: int
-):
-    with open(file_path, "rb") as f:
-        f.seek(start)
-        while (pos := f.tell()) <= end:
-            read_size = min(chunk_size, end + 1 - pos)
-            yield f.read(read_size)
+
 
 
 @router.get("/stream/{token}")
@@ -96,7 +90,7 @@ async def stream_video(
     request: Request,
     db: AsyncSession = Depends(get_db),
 ) -> Any:
-    """Stream the video file using byte-range requests."""
+    """Redirect to a secure Supabase signed URL for streaming."""
     # Find active session
     v_session = await db.scalar(
         select(VideoSession).where(
@@ -115,71 +109,27 @@ async def stream_video(
     if not lesson:
         raise HTTPException(status_code=404, detail="Lesson not found")
 
-    video_dir_str = getattr(settings, 'video_storage_path', "videos")
-    video_dir = Path(video_dir_str)
-    
     if not lesson.video_url:
-        # Fallback to sample for empty lessons so the UI doesn't crash
-        file_path = video_dir / "sample.mp4"
-        if not file_path.exists():
-            file_path = Path("videos/sample.mp4")
+        # Fallback to sample if missing
+        filename = "sample.mp4"
     else:
-        # Construct the file path using the stored video_url
-        video_path_str = lesson.video_url
-        if video_path_str.startswith("/videos/"):
-            video_path_str = video_path_str.replace("/videos/", "", 1)
-        file_path = video_dir / video_path_str
+        filename = lesson.video_url
+        # Clean up path prefixes if any
+        for prefix in ["/videos/", "videos/", "/"]:
+            if filename.startswith(prefix):
+                filename = filename.replace(prefix, "", 1)
 
-    if not file_path.exists():
-        raise HTTPException(status_code=404, detail="Video file not found locally")
-
-    file_size = file_path.stat().st_size
-    range_header = request.headers.get("range", None)
-
-    if range_header:
-        # Expected format: bytes=0-1024 or bytes=0-
-        byte_range = range_header.replace("bytes=", "").split("-")
+    try:
+        # Generate a signed URL that expires in 2 hours
+        signed_url = await get_signed_url("videos", filename, expires_in=7200)
+    except Exception as e:
+        print(f"Supabase Connection Error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error connecting to Supabase storage")
         
-        try:
-            byte1 = int(byte_range[0])
-        except ValueError:
-            byte1 = 0
-            
-        byte2 = None
-        if len(byte_range) > 1 and byte_range[1]:
-            try:
-                byte2 = int(byte_range[1])
-            except ValueError:
-                pass
-                
-        if byte2 is None:
-            byte2 = file_size - 1
-
-        length = byte2 - byte1 + 1
+    if not signed_url:
+        raise HTTPException(status_code=404, detail="Video file not found in Supabase storage")
         
-        headers = {
-            "Content-Range": f"bytes {byte1}-{byte2}/{file_size}",
-            "Accept-Ranges": "bytes",
-            "Content-Length": str(length),
-            "Content-Type": "video/mp4",
-        }
-        
-        return StreamingResponse(
-            send_bytes_range_requests(str(file_path), byte1, byte2, CHUNK_SIZE),
-            status_code=206,
-            headers=headers,
-        )
-    else:
-        headers = {
-            "Accept-Ranges": "bytes",
-            "Content-Length": str(file_size),
-            "Content-Type": "video/mp4",
-        }
-        return StreamingResponse(
-            send_bytes_range_requests(str(file_path), 0, file_size - 1, CHUNK_SIZE),
-            status_code=200,
-            headers=headers,
-        )
+    return RedirectResponse(signed_url)
 
 
 @router.post("/progress", response_model=VideoProgressResponse)

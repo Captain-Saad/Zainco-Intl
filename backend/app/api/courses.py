@@ -229,12 +229,32 @@ async def delete_course(
     admin: User = Depends(require_admin),
 ) -> Any:
     """Delete course (Admin)."""
-    course = await db.get(Course, course_id)
+    course = await db.execute(
+        select(Course)
+        .options(selectinload(Course.lessons))
+        .where(Course.id == course_id)
+    )
+    course = course.scalar()
+    
     if not course:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Course not found"
         )
-        
+    
+    from app.core.supabase import delete_file
+    
+    # 1. Delete course thumbnail if it exists in Supabase
+    if course.thumbnail_url:
+        # Assuming thumbnail_url is a full path or just the filename
+        # If it's a full URL, we extract the filename
+        filename = course.thumbnail_url.split("/")[-1]
+        await delete_file("images", filename)
+    
+    # 2. Delete all lesson videos
+    for lesson in course.lessons:
+        if lesson.video_url:
+            await delete_file("videos", lesson.video_url)
+
     await db.delete(course)
     await db.commit()
-    return {"message": "Deleted"}
+    return {"message": "Course and all associated assets deleted"}

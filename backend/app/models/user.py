@@ -36,8 +36,8 @@ class User(Base):
     )
 
     # Relationships
-    enrollments = relationship("Enrollment", back_populates="user", lazy="selectin")
-    lesson_progress = relationship("LessonProgress", back_populates="user", lazy="selectin")
-    activities = relationship("Activity", back_populates="user", lazy="selectin")
-    achievements = relationship("Achievement", back_populates="user", lazy="selectin")
-    video_sessions = relationship("VideoSession", back_populates="user", lazy="selectin")
+    enrollments = relationship("Enrollment", back_populates="user", lazy="selectin", cascade="all, delete-orphan")
+    lesson_progress = relationship("LessonProgress", back_populates="user", lazy="selectin", cascade="all, delete-orphan")
+    activities = relationship("Activity", back_populates="user", lazy="selectin", cascade="all, delete-orphan")
+    achievements = relationship("Achievement", back_populates="user", lazy="selectin", cascade="all, delete-orphan")
+    video_sessions = relationship("VideoSession", back_populates="user", lazy="selectin", cascade="all, delete-orphan")

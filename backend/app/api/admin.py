@@ -15,6 +15,7 @@ from app.models.course import Course
 from app.models.lesson import Lesson
 from app.models.progress import Enrollment, VideoSession
 from app.models.user import User
+from app.core.supabase import upload_file, get_public_url
 from app.schemas.admin import (
     AdminStatsResponse,
     CreateStudentRequest,
@@ -47,12 +48,16 @@ async def upload_course_image(
 
     ext = file.filename.split(".")[-1] if "." in file.filename else "jpg"
     filename = f"{uuid.uuid4().hex}.{ext}"
-    file_path = images_dir / filename
+    
+    # Read file content
+    content = await file.read()
+    
+    # Upload to Supabase 'images' bucket
+    await upload_file("images", filename, content, file.content_type)
 
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-
-    return {"url": f"/images/{filename}"}
+    # Get the URL (can be public or we store the path)
+    public_url = get_public_url("images", filename)
+    return {"url": public_url}
 
 
 @router.get("/stats", response_model=AdminStatsResponse)
@@ -310,21 +315,85 @@ async def upload_video(
     if not lesson:
         raise HTTPException(status_code=404, detail="Lesson not found")
 
-    # Generate a unique filename to avoid overwrites
-    ext = file.filename.split(".")[-1] if "." in file.filename else "mp4"
-    filename = f"{uuid.uuid4().hex}.{ext}"
-    file_path = videos_dir / filename
+    from app.core.supabase import upload_file, delete_file
 
-    # Save to disk
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-
-    # Update lesson record
-    lesson.video_url = filename
+    # Mark as uploading so frontend can show progress/lock
+    lesson.is_uploading = True
     db.add(lesson)
     await db.commit()
 
+    # Generate a unique filename to avoid overwrites
+    ext = file.filename.split(".")[-1] if "." in file.filename else "mp4"
+    filename = f"{uuid.uuid4().hex}.{ext}"
+
+    try:
+        # Read file content
+        content = await file.read()
+        
+        # 1. Delete previous video if it exists
+        if lesson.video_url:
+            print(f"DEBUG: Deleting old video {lesson.video_url}...")
+            await delete_file("videos", lesson.video_url)
+
+        # 2. Upload new video
+        print(f"DEBUG: Starting direct HTTP upload for {filename}...")
+        await upload_file("videos", filename, content, file.content_type)
+        
+        # 3. Update lesson record
+        lesson.video_url = filename
+        lesson.is_uploading = False
+        db.add(lesson)
+        await db.commit()
+    except Exception as e:
+        lesson.is_uploading = False
+        db.add(lesson)
+        await db.commit()
+        print(f"DEBUG: Supabase upload failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
+
     return {"message": f"Video successfully uploaded and linked to '{lesson.title}'"}
+
+@router.post("/curriculum/{item_id}/slides", response_model=GenericMessageResponse)
+async def upload_slides(
+    item_id: uuid.UUID,
+    file: UploadFile = File(...),
+    db: AsyncSession = Depends(get_db),
+    admin: User = Depends(require_admin),
+) -> Any:
+    """Upload slides for a curriculum item (Admin only)."""
+    from app.models.curriculum import CurriculumItem
+    from app.core.supabase import upload_file, delete_file
+
+    item = await db.get(CurriculumItem, item_id)
+    if not item:
+        raise HTTPException(status_code=404, detail="Curriculum item not found")
+
+    if item.type != "slides":
+        raise HTTPException(status_code=400, detail="Item is not a slides module")
+
+    # Generate a unique filename
+    ext = file.filename.split(".")[-1] if "." in file.filename else "pdf"
+    filename = f"{uuid.uuid4().hex}.{ext}"
+
+    try:
+        content = await file.read()
+        
+        # 1. Cleanup old file if it exists
+        if item.slides_url:
+            await delete_file("slides", item.slides_url)
+
+        # 2. Upload new file
+        await upload_file("slides", filename, content, file.content_type)
+        
+        # 3. Update DB
+        item.slides_url = filename
+        db.add(item)
+        await db.commit()
+    except Exception as e:
+        print(f"DEBUG: Slides upload failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
+
+    return {"message": f"Slides successfully uploaded for '{item.title}'"}
 
 from app.schemas.admin import AdminGraphsResponse, GraphDataResponse, DailyActivityResponse, PieDataResponse, UpdateStudentStatusRequest
 

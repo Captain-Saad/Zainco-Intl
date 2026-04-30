@@ -9,6 +9,7 @@ import { customFetch } from "@workspace/api-client-react";
 export default function SlidesPlayer() {
   const [, params] = useRoute("/courses/:courseId/slides/:itemId");
   const { user } = useAuth();
+  const [isFullScreen, setIsFullScreen] = useState(false);
   
   // Fetch curriculum for sidebar and current item
   const { data: curriculum, isLoading: isCurriculumLoading } = useQuery({
@@ -58,6 +59,13 @@ export default function SlidesPlayer() {
           <span className="ml-2 px-2 py-0.5 rounded border border-accent/30 text-accent text-[10px] uppercase tracking-widest font-mono">Slides</span>
         </div>
         <div className="flex gap-3">
+          {currentItem.slides_url && (
+            <a href={currentItem.slides_url} download target="_blank" rel="noopener noreferrer">
+              <Button variant="ghost" size="sm" className="gap-2">
+                <Download size={16} /> Download
+              </Button>
+            </a>
+          )}
           {nextItem && isCompleted && (
             <Button onClick={handleContinue} className="gap-2">
                Continue <CheckCircle2 size={16} />
@@ -73,14 +81,36 @@ export default function SlidesPlayer() {
 
       <div className="flex-1 flex flex-col lg:flex-row overflow-auto lg:overflow-hidden">
         {/* Main Content (Slides Viewer) */}
-        <div className="flex-1 flex flex-col bg-secondary/20 p-4 md:p-8 relative lg:overflow-y-auto items-center justify-center">
-          <div className="w-full max-w-5xl aspect-[4/3] bg-card rounded-2xl border border-border shadow-2xl overflow-hidden flex flex-col">
+        <div className={`flex-1 flex flex-col bg-secondary/20 p-4 md:p-8 relative lg:overflow-y-auto items-center justify-center ${
+          isFullScreen ? 'fixed inset-0 z-[100] bg-black p-0 md:p-0' : ''
+        }`}>
+          <div className={`w-full max-w-5xl bg-card border border-border shadow-2xl overflow-hidden flex flex-col transition-all duration-300 ${
+            isFullScreen ? 'max-w-none h-screen rounded-none border-0' : 'aspect-[4/3] rounded-2xl'
+          }`}>
+            <div className="absolute top-4 right-4 z-[110] flex gap-2">
+                <Button 
+                    variant="secondary" 
+                    size="icon" 
+                    className="bg-black/40 hover:bg-black/60 backdrop-blur-md border-white/10"
+                    onClick={() => setIsFullScreen(!isFullScreen)}
+                >
+                    <Maximize2 size={18} className={isFullScreen ? 'rotate-180' : ''} />
+                </Button>
+            </div>
             {currentItem.slides_url ? (
-               <iframe 
-               src={`https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(currentItem.slides_url)}`}
-               className="w-full h-full border-none"
-               title="Slides Viewer"
-             />
+              <iframe 
+                src={(() => {
+                  const fullUrl = currentItem.slides_url.startsWith('http') 
+                    ? currentItem.slides_url 
+                    : `https://cnkqsinhqbzpkejucygz.supabase.co/storage/v1/object/public/slides/${currentItem.slides_url}`;
+                  
+                  return fullUrl.toLowerCase().split('?')[0].endsWith('.pdf')
+                    ? fullUrl
+                    : `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(fullUrl)}`;
+                })()}
+                className="w-full h-full border-none"
+                title="Slides Viewer"
+              />
             ) : (
                 <div className="flex-1 flex flex-col items-center justify-center space-y-4">
                     <FileText size={64} className="text-muted-foreground opacity-20" />

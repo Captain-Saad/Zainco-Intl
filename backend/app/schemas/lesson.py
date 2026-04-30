@@ -28,6 +28,7 @@ class LessonResponse(LessonBase):
     id: UUID
     course_id: UUID
     is_locked: bool
+    is_uploading: bool = False
     completed: bool = False
     video_key: str | None = None
     created_at: datetime

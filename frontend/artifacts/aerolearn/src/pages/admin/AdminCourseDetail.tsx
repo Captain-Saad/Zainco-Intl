@@ -6,7 +6,7 @@ import { Modal } from "@/components/shared/Modal";
 import { Input } from "@/components/shared/Input";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { customFetch } from "@workspace/api-client-react";
-import { Edit, Trash2, GripVertical, FileVideo, UploadCloud, Eye, BookOpen, ChevronDown, Plus, FileText, HelpCircle, ClipboardList } from "lucide-react";
+import { Edit, Trash2, GripVertical, FileVideo, UploadCloud, Eye, BookOpen, ChevronDown, Plus, FileText, HelpCircle, ClipboardList, Loader2, ExternalLink, Upload, Maximize2 } from "lucide-react";
 import QuizBuilder from "@/components/admin/QuizBuilder";
 
 interface CurriculumItemData {
@@ -46,6 +46,13 @@ export default function AdminCourseDetail() {
     is_locked: false,
   });
 
+  // Track background uploads: { [lessonId: string]: { fileName: string, progress: number } }
+  const [activeUploads, setActiveUploads] = useState<Record<string, { fileName: string, progress: number }>>({});
+  const [viewingSlideUrl, setViewingSlideUrl] = useState<string | null>(null);
+  const [isSlideFullScreen, setIsSlideFullScreen] = useState(false);
+  
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+
   const { data: course, isLoading: loadingCourse } = useQuery({
     queryKey: ['admin-course-detail', courseId],
     queryFn: () => customFetch<CourseData>(`/api/courses/${courseId}`),
@@ -67,8 +74,7 @@ export default function AdminCourseDetail() {
       }),
     onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['admin-course-curriculum', courseId] });
-      setModalType(null);
-      // Wait to implement complex uploads (e.g. video files associated with a lesson) later if needed
+      // Modal will be closed by the specific handler once sub-tasks are done
     },
   });
 
@@ -91,6 +97,128 @@ export default function AdminCourseDetail() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-course-curriculum', courseId] }),
   });
 
+  const uploadVideoMutation = useMutation({
+    mutationFn: async ({ lessonId, file }: { lessonId: string; file: File }) => {
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', `/api/admin/lessons/${lessonId}/video`);
+        
+        // Track this upload in our background state
+        setActiveUploads(prev => ({
+          ...prev,
+          [lessonId]: { fileName: file.name, progress: 0 }
+        }));
+
+        xhr.upload.onprogress = (event) => {
+          if (event.lengthComputable) {
+            const percent = Math.round((event.loaded / event.total) * 100);
+            setActiveUploads(prev => ({
+              ...prev,
+              [lessonId]: { ...prev[lessonId], progress: percent }
+            }));
+          }
+        };
+
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            setActiveUploads(prev => {
+              const next = { ...prev };
+              delete next[lessonId];
+              return next;
+            });
+            resolve(JSON.parse(xhr.responseText));
+          } else {
+            setActiveUploads(prev => {
+              const next = { ...prev };
+              delete next[lessonId];
+              return next;
+            });
+            reject(new Error('Upload failed'));
+          }
+        };
+
+        xhr.onerror = () => {
+          setActiveUploads(prev => {
+            const next = { ...prev };
+            delete next[lessonId];
+            return next;
+          });
+          reject(new Error('Upload failed'));
+        };
+
+        const token = localStorage.getItem('token');
+        if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+        const data = new FormData();
+        data.append('file', file);
+        xhr.send(data);
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-course-curriculum', courseId] });
+    },
+  });
+
+  const uploadSlidesMutation = useMutation({
+    mutationFn: async ({ itemId, file }: { itemId: string, file: File }) => {
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', `/api/admin/curriculum/${itemId}/slides`);
+        
+        // Track this upload in our background state
+        setActiveUploads(prev => ({
+          ...prev,
+          [itemId]: { fileName: file.name, progress: 0 }
+        }));
+
+        xhr.upload.onprogress = (event) => {
+          if (event.lengthComputable) {
+            const percent = Math.round((event.loaded / event.total) * 100);
+            setActiveUploads(prev => ({
+              ...prev,
+              [itemId]: { ...prev[itemId], progress: percent }
+            }));
+          }
+        };
+
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            setActiveUploads(prev => {
+              const next = { ...prev };
+              delete next[itemId];
+              return next;
+            });
+            resolve(JSON.parse(xhr.responseText));
+          } else {
+            setActiveUploads(prev => {
+              const next = { ...prev };
+              delete next[itemId];
+              return next;
+            });
+            reject(new Error('Upload failed'));
+          }
+        };
+
+        xhr.onerror = () => {
+          setActiveUploads(prev => {
+            const next = { ...prev };
+            delete next[itemId];
+            return next;
+          });
+          reject(new Error('Upload failed'));
+        };
+
+        const token = localStorage.getItem('token');
+        if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+        const data = new FormData();
+        data.append('file', file);
+        xhr.send(data);
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-course-curriculum', courseId] });
+    },
+  });
+
   // Example handling specifically for the Video "Lesson" legacy type creation -> then Curriculum Item creation.
   const createLegacyLessonMutation = useMutation({
     mutationFn: (newLesson: any) => 
@@ -99,45 +227,62 @@ export default function AdminCourseDetail() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newLesson),
       }),
-    onSuccess: (lessonData: any) => {
-      // Then tie it to Curriculum
-      createCurriculumMutation.mutate({
+    onSuccess: async (lessonData: any) => {
+      // Create Curriculum Item first (fast)
+      await createCurriculumMutation.mutateAsync({
         title: formData.title,
         type: "lesson",
         order_index: (curriculumItems?.length || 0),
         is_locked: formData.is_locked,
         lesson_id: lessonData.id
       });
+      
+      // Start background upload but don't await it here if we want backgrounding
       if (videoFile && lessonData.id) {
-        // uploadVideoMutation.mutate({ lessonId: lessonData.id, file: videoFile }); // implement if needed
+        uploadVideoMutation.mutate({ lessonId: lessonData.id, file: videoFile });
       }
+      
+      setModalType(null);
     }
   });
 
-  const handleVideoSubmit = (e: React.FormEvent) => {
+  const handleVideoSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.title) return;
     
     if (selectedItem) {
-      updateCurriculumMutation.mutate({
+      await updateCurriculumMutation.mutateAsync({
         id: selectedItem.id,
         data: {
           title: formData.title,
           is_locked: formData.is_locked,
         }
       });
+      
+      if (videoFile && selectedItem.lesson_id) {
+        // Start background upload but close modal immediately
+        uploadVideoMutation.mutate({ lessonId: selectedItem.lesson_id, file: videoFile });
+        setModalType(null);
+      } else {
+        setModalType(null);
+      }
     } else {
       createLegacyLessonMutation.mutate({
-        title: formData.title,
-        description: formData.description,
-        order_index: (curriculumItems?.length || 0),
-        duration: formData.duration,
-        is_locked: formData.is_locked,
+        courseId: courseId!,
+        lesson: {
+          title: formData.title,
+          description: formData.description,
+          duration: formData.duration,
+          order_index: curriculumItems?.length || 0,
+          is_locked: formData.is_locked,
+        }
       });
+      // createLegacyLessonMutation's onSuccess already starts the upload if videoFile exists
+      setModalType(null);
     }
   };
 
-  const handleSlidesSubmit = (e: React.FormEvent) => {
+  const handleSlidesSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.title) return;
 
@@ -149,14 +294,26 @@ export default function AdminCourseDetail() {
           is_locked: formData.is_locked,
         }
       });
+      
+      if (slidesFile && selectedItem.id) {
+        uploadSlidesMutation.mutate({ itemId: selectedItem.id, file: slidesFile });
+      }
+      setModalType(null);
     } else {
       createCurriculumMutation.mutate({
         title: formData.title,
         type: "slides",
         order_index: curriculumItems?.length || 0,
         is_locked: formData.is_locked,
-        slides_url: slidesFile ? slidesFile.name : null,
+        slides_url: null,
+      }, {
+        onSuccess: (newItem: any) => {
+          if (slidesFile && newItem.id) {
+            uploadSlidesMutation.mutate({ itemId: newItem.id, file: slidesFile });
+          }
+        }
       });
+      setModalType(null);
     }
   };
 
@@ -178,8 +335,8 @@ export default function AdminCourseDetail() {
     setVideoFile(null);
     setFormData({
       title: item.title,
-      description: "", // Fetched details for legacy lessons if needed
-      duration: "",
+      description: item.lesson?.description || "",
+      duration: item.lesson?.duration || "",
       is_locked: item.is_locked,
     });
     setModalType(item.type === "lesson" ? "video" : item.type as "slides" | "quiz");
@@ -277,13 +434,40 @@ export default function AdminCourseDetail() {
                         </Link>
                       </>
                     )}
-                    <Button 
-                      size="icon" 
-                      variant="ghost" 
-                      onClick={() => openEditModal(item)}
-                    >
-                      <Edit size={16} />
-                    </Button>
+                    {item.type === 'slides' && item.slides_url && (
+                      <Button 
+                        size="icon" 
+                        variant="ghost" 
+                        className="text-muted-foreground hover:text-accent hover:bg-accent/10 transition-colors" 
+                        title="View Slides"
+                        onClick={() => {
+                          const fullUrl = item.slides_url!.startsWith('http') 
+                            ? item.slides_url! 
+                            : `https://cnkqsinhqbzpkejucygz.supabase.co/storage/v1/object/public/slides/${item.slides_url}`;
+                          setViewingSlideUrl(fullUrl);
+                        }}
+                      >
+                        <Eye size={16} />
+                      </Button>
+                    )}
+                    <div className="flex items-center gap-3">
+                      {item.type === 'lesson' && item.lesson?.is_uploading && (
+                        <div className="flex items-center gap-2 px-2 py-1 bg-amber-500/10 text-amber-500 rounded text-xs animate-pulse">
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                          {item.lesson_id && activeUploads[item.lesson_id] 
+                            ? `${activeUploads[item.lesson_id].progress}%` 
+                            : "Uploading..."}
+                        </div>
+                      )}
+                      <Button 
+                        size="icon" 
+                        variant="ghost" 
+                        onClick={() => openEditModal(item)}
+                        disabled={item.type === 'lesson' && item.lesson?.is_uploading}
+                      >
+                        <Edit size={16} />
+                      </Button>
+                    </div>
                     <Button 
                       size="icon" 
                       variant="danger" 
@@ -362,8 +546,23 @@ export default function AdminCourseDetail() {
               </label>
             </div>
 
-            <Button type="submit" className="w-full mt-6" disabled={createCurriculumMutation.isPending || updateCurriculumMutation.isPending}>
-              {selectedItem ? "Save Changes" : "Create Lesson"}
+            {uploadProgress !== null && (
+              <div className="space-y-2 mt-4">
+                <div className="flex justify-between text-xs font-mono">
+                  <span className="text-primary uppercase tracking-wider">Uploading Video...</span>
+                  <span className="text-primary">{uploadProgress}%</span>
+                </div>
+                <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden border border-white/5">
+                  <div 
+                    className="bg-primary h-full transition-all duration-300 ease-out shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]" 
+                    style={{ width: `${uploadProgress}%` }}
+                  />
+                </div>
+              </div>
+            )}
+
+            <Button type="submit" className="w-full mt-6" disabled={createCurriculumMutation.isPending || updateCurriculumMutation.isPending || uploadVideoMutation.isPending}>
+              {uploadVideoMutation.isPending ? "Finalizing..." : (selectedItem ? "Save Changes" : "Create Lesson")}
             </Button>
           </form>
         </Modal>
@@ -407,8 +606,8 @@ export default function AdminCourseDetail() {
               </label>
             </div>
 
-            <Button type="submit" className="w-full mt-4" disabled={createCurriculumMutation.isPending}>
-              Create Slides Module
+            <Button type="submit" className="w-full mt-4" disabled={createCurriculumMutation.isPending || uploadSlidesMutation.isPending}>
+              {createCurriculumMutation.isPending || uploadSlidesMutation.isPending ? "Uploading..." : "Create Slides Module"}
             </Button>
           </form>
         </Modal>
@@ -430,6 +629,83 @@ export default function AdminCourseDetail() {
             }}
           />
         )}
+
+        {/* Background Upload Tracker Widget */}
+        {Object.keys(activeUploads).length > 0 && (
+          <div className="fixed bottom-6 right-6 w-80 bg-card border border-border rounded-xl shadow-2xl p-4 z-[100] animate-in slide-in-from-right-10 duration-300">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="font-semibold text-sm">Active Uploads</h4>
+              <span className="bg-primary/10 text-primary text-[10px] px-2 py-0.5 rounded-full">
+                {Object.keys(activeUploads).length} item(s)
+              </span>
+            </div>
+            <div className="space-y-3">
+              {Object.entries(activeUploads).map(([id, upload]) => (
+                <div key={id} className="space-y-1">
+                  <div className="flex justify-between text-xs">
+                    <span className="truncate w-40">{upload.fileName}</span>
+                    <span className="font-medium">{upload.progress}%</span>
+                  </div>
+                  <div className="w-full h-1.5 bg-secondary rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-primary transition-all duration-300"
+                      style={{ width: `${upload.progress}%` }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Slide Viewer Modal */}
+        <Modal 
+          isOpen={!!viewingSlideUrl} 
+          onClose={() => {
+            setViewingSlideUrl(null);
+            setIsSlideFullScreen(false);
+          }} 
+          title={isSlideFullScreen ? "" : "Slide Viewer"}
+          size={isSlideFullScreen ? "full" : "xl"}
+          className={isSlideFullScreen ? "p-0 !max-w-none !m-0 rounded-none h-screen" : ""}
+        >
+          <div className={`w-full bg-black/5 rounded-xl overflow-hidden relative transition-all duration-300 ${
+            isSlideFullScreen 
+              ? 'fixed inset-0 z-[200] h-screen w-screen rounded-none bg-black' 
+              : 'h-[70vh]'
+          }`}>
+            <div className={`absolute z-[210] flex gap-2 ${isSlideFullScreen ? 'top-6 right-16' : 'top-4 right-14'}`}>
+              <Button 
+                variant="secondary" 
+                size="icon" 
+                className="bg-black/40 hover:bg-black/60 backdrop-blur-md border-white/10"
+                onClick={() => setIsSlideFullScreen(!isSlideFullScreen)}
+                title={isSlideFullScreen ? "Exit Full Screen" : "Full Screen"}
+              >
+                <Maximize2 size={16} className={isSlideFullScreen ? 'rotate-180' : ''} />
+              </Button>
+            </div>
+            {viewingSlideUrl && (
+              <iframe
+                src={
+                  viewingSlideUrl.toLowerCase().split('?')[0].endsWith('.pdf') 
+                    ? viewingSlideUrl 
+                    : `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(viewingSlideUrl)}`
+                }
+                className="w-full h-full border-0"
+                title="Slide Content"
+              />
+            )}
+          </div>
+          <div className="mt-4 flex justify-end">
+            <a href={viewingSlideUrl || "#"} download target="_blank" rel="noopener noreferrer">
+              <Button variant="ghost" size="sm" className="gap-2">
+                <Upload size={14} className="rotate-180" />
+                Download Original
+              </Button>
+            </a>
+          </div>
+        </Modal>
       </main>
     </div>
   );

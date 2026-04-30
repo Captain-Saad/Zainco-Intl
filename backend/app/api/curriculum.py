@@ -153,12 +153,66 @@ async def delete_curriculum_item(
     if current_user.role != "admin":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin only")
 
-    stmt = select(CurriculumItem).where(CurriculumItem.id == item_id)
+    stmt = (
+        select(CurriculumItem)
+        .options(selectinload(CurriculumItem.lesson))
+        .where(CurriculumItem.id == item_id)
+    )
     result = await db.execute(stmt)
     db_item = result.scalar_one_or_none()
     
     if not db_item:
         raise HTTPException(status_code=404, detail="Item not found")
 
+    from app.core.supabase import delete_file
+
+    # 1. Delete slides if they exist
+    if db_item.slides_url:
+        filename = db_item.slides_url.split("/")[-1]
+        await delete_file("slides", filename)
+
+    # 2. Delete video if it's a lesson
+    if db_item.type == "lesson" and db_item.lesson:
+        if db_item.lesson.video_url:
+            await delete_file("videos", db_item.lesson.video_url)
+
     await db.delete(db_item)
     await db.commit()
+
+from fastapi import UploadFile, File
+from app.core.supabase import upload_file as supabase_upload, get_public_url
+
+@router.post("/api/admin/curriculum/{item_id}/slides")
+async def upload_slides(
+    item_id: UUID,
+    file: UploadFile = File(...),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin only")
+        
+    db_item = await db.get(CurriculumItem, item_id)
+    if not db_item:
+        raise HTTPException(status_code=404, detail="Item not found")
+
+    # Generate filename
+    import uuid
+    ext = file.filename.split(".")[-1] if "." in file.filename else "pdf"
+    filename = f"{uuid.uuid4().hex}.{ext}"
+    
+    # Read content
+    content = await file.read()
+    
+    # Upload to Supabase
+    await supabase_upload("slides", filename, content, file.content_type)
+    
+    # Get public URL
+    public_url = get_public_url("slides", filename)
+    
+    # Update DB
+    db_item.slides_url = public_url
+    db.add(db_item)
+    await db.commit()
+    
+    return {"url": public_url}

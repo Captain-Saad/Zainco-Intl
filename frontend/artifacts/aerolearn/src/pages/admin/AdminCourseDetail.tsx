@@ -46,8 +46,8 @@ export default function AdminCourseDetail() {
     is_locked: false,
   });
 
-  // Track background uploads: { [lessonId: string]: { fileName: string, progress: number } }
-  const [activeUploads, setActiveUploads] = useState<Record<string, { fileName: string, progress: number }>>({});
+  // Track background uploads: { [lessonId: string]: { fileName: string, progress: number, error?: string, status: 'uploading' | 'error' | 'success' } }
+  const [activeUploads, setActiveUploads] = useState<Record<string, { fileName: string, progress: number, error?: string, status: 'uploading' | 'error' | 'success' }>>({});
   const [viewingSlideUrl, setViewingSlideUrl] = useState<string | null>(null);
   const [isSlideFullScreen, setIsSlideFullScreen] = useState(false);
   
@@ -106,7 +106,7 @@ export default function AdminCourseDetail() {
         // Track this upload in our background state
         setActiveUploads(prev => ({
           ...prev,
-          [lessonId]: { fileName: file.name, progress: 0 }
+          [lessonId]: { fileName: file.name, progress: 0, status: 'uploading' }
         }));
 
         xhr.upload.onprogress = (event) => {
@@ -121,29 +121,49 @@ export default function AdminCourseDetail() {
 
         xhr.onload = () => {
           if (xhr.status >= 200 && xhr.status < 300) {
+            // On success, we can clear it or mark as success
             setActiveUploads(prev => {
               const next = { ...prev };
-              delete next[lessonId];
+              // We'll keep it for a moment so user sees 100%
+              next[lessonId] = { ...next[lessonId], progress: 100, status: 'success' };
               return next;
             });
-            resolve(JSON.parse(xhr.responseText));
+            
+            // Auto-remove success items after 3 seconds
+            setTimeout(() => {
+              setActiveUploads(prev => {
+                const next = { ...prev };
+                if (next[lessonId]?.status === 'success') delete next[lessonId];
+                return next;
+              });
+            }, 3000);
+
+            try {
+              resolve(JSON.parse(xhr.responseText));
+            } catch (e) {
+              resolve({ message: "Upload finished" });
+            }
           } else {
-            setActiveUploads(prev => {
-              const next = { ...prev };
-              delete next[lessonId];
-              return next;
-            });
-            reject(new Error('Upload failed'));
+            let errorMsg = 'Upload failed';
+            try {
+              const res = JSON.parse(xhr.responseText);
+              errorMsg = res.detail || res.message || errorMsg;
+            } catch (e) {}
+            
+            setActiveUploads(prev => ({
+              ...prev,
+              [lessonId]: { ...prev[lessonId], status: 'error', error: errorMsg }
+            }));
+            reject(new Error(errorMsg));
           }
         };
 
         xhr.onerror = () => {
-          setActiveUploads(prev => {
-            const next = { ...prev };
-            delete next[lessonId];
-            return next;
-          });
-          reject(new Error('Upload failed'));
+          setActiveUploads(prev => ({
+            ...prev,
+            [lessonId]: { ...prev[lessonId], status: 'error', error: 'Network error' }
+          }));
+          reject(new Error('Network error'));
         };
 
         const token = localStorage.getItem('token');
@@ -268,14 +288,11 @@ export default function AdminCourseDetail() {
       }
     } else {
       createLegacyLessonMutation.mutate({
-        courseId: courseId!,
-        lesson: {
-          title: formData.title,
-          description: formData.description,
-          duration: formData.duration,
-          order_index: curriculumItems?.length || 0,
-          is_locked: formData.is_locked,
-        }
+        title: formData.title,
+        description: formData.description,
+        duration: formData.duration,
+        order_index: curriculumItems?.length || 0,
+        is_locked: formData.is_locked,
       });
       // createLegacyLessonMutation's onSuccess already starts the upload if videoFile exists
       setModalType(null);
@@ -634,7 +651,7 @@ export default function AdminCourseDetail() {
         {Object.keys(activeUploads).length > 0 && (
           <div className="fixed bottom-6 right-6 w-80 bg-card border border-border rounded-xl shadow-2xl p-4 z-[100] animate-in slide-in-from-right-10 duration-300">
             <div className="flex items-center justify-between mb-3">
-              <h4 className="font-semibold text-sm">Active Uploads</h4>
+              <h4 className="font-semibold text-sm">Upload Status</h4>
               <span className="bg-primary/10 text-primary text-[10px] px-2 py-0.5 rounded-full">
                 {Object.keys(activeUploads).length} item(s)
               </span>
@@ -642,16 +659,34 @@ export default function AdminCourseDetail() {
             <div className="space-y-3">
               {Object.entries(activeUploads).map(([id, upload]) => (
                 <div key={id} className="space-y-1">
-                  <div className="flex justify-between text-xs">
-                    <span className="truncate w-40">{upload.fileName}</span>
-                    <span className="font-medium">{upload.progress}%</span>
+                  <div className="flex justify-between text-xs items-center">
+                    <span className="truncate w-40" title={upload.fileName}>{upload.fileName}</span>
+                    {upload.status === 'error' ? (
+                      <span className="text-destructive font-bold flex items-center gap-1">
+                        <Trash2 size={10} className="cursor-pointer" onClick={() => {
+                          setActiveUploads(prev => {
+                            const next = { ...prev };
+                            delete next[id];
+                            return next;
+                          });
+                        }} /> FAIL
+                      </span>
+                    ) : (
+                      <span className="font-medium">{upload.progress}%</span>
+                    )}
                   </div>
-                  <div className="w-full h-1.5 bg-secondary rounded-full overflow-hidden">
+                  <div className={`w-full h-1.5 rounded-full overflow-hidden ${upload.status === 'error' ? 'bg-destructive/20' : 'bg-secondary'}`}>
                     <div 
-                      className="h-full bg-primary transition-all duration-300"
+                      className={`h-full transition-all duration-300 ${
+                        upload.status === 'error' ? 'bg-destructive' : 
+                        upload.status === 'success' ? 'bg-emerald-500' : 'bg-primary'
+                      }`}
                       style={{ width: `${upload.progress}%` }}
                     />
                   </div>
+                  {upload.error && (
+                    <p className="text-[10px] text-destructive leading-tight">{upload.error}</p>
+                  )}
                 </div>
               ))}
             </div>

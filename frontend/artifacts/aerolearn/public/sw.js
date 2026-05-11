@@ -1,4 +1,4 @@
-const CACHE = 'aerolearn-v1';
+const CACHE = 'aerolearn-v2';
 const STATIC = [
   '/',
   '/login',
@@ -16,7 +16,14 @@ self.addEventListener('install', (e) => {
 });
 
 self.addEventListener('activate', (e) => {
-  e.waitUntil(self.clients.claim());
+  // Purge all old caches so users get fresh assets on new deployments
+  e.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(
+        keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))
+      )
+    ).then(() => self.clients.claim())
+  );
 });
 
 self.addEventListener('fetch', (e) => {
@@ -52,10 +59,17 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  // Regular asset requests: Cache-first
+  // Regular asset requests: Network-first (ensures new deployments are picked up)
+  // Falls back to cache only when offline
   e.respondWith(
-    caches.match(e.request).then(
-      (cached) => cached || fetch(e.request)
-    )
+    fetch(e.request)
+      .then((response) => {
+        // Update the cache with the fresh response
+        const clone = response.clone();
+        caches.open(CACHE).then((cache) => cache.put(e.request, clone));
+        return response;
+      })
+      .catch(() => caches.match(e.request))
   );
 });
+

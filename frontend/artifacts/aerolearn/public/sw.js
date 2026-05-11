@@ -1,12 +1,9 @@
-const CACHE = 'aerolearn-v2';
+const CACHE = 'aerolearn-v3';
 const STATIC = [
   '/',
   '/login',
   '/images/logo.png',
 ];
-
-// Backend API server — in production, use same origin (Vercel rewrites handle proxying)
-const API_BACKEND = self.location.origin;
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
@@ -29,20 +26,10 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url);
 
-  // Proxy /api/ and /quiz-files/ requests to the backend server
-  // This ensures they work in standalone PWA mode where Vite proxy isn't available
-  if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/quiz-files/')) {
-    const backendUrl = API_BACKEND + url.pathname + url.search;
-    const modifiedRequest = new Request(backendUrl, {
-      method: e.request.method,
-      headers: e.request.headers,
-      body: e.request.method !== 'GET' && e.request.method !== 'HEAD' ? e.request.body : undefined,
-      mode: 'cors',
-      credentials: 'same-origin',
-      redirect: 'follow',
-      duplex: 'half',
-    });
-    e.respondWith(fetch(modifiedRequest));
+  // DO NOT intercept API or backend requests — let the browser handle them natively.
+  // Vercel rewrites (vercel.json) proxy /api/* and /quiz-files/* to Render.
+  // Intercepting here breaks Safari/WebKit which doesn't support ReadableStream body in SW.
+  if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/quiz-files/') || url.pathname.startsWith('/images/')) {
     return;
   }
 

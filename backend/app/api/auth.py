@@ -1,7 +1,7 @@
 """Auth API routes: login, me, logout."""
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_current_user, get_db
@@ -16,7 +16,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 @router.post("/login", response_model=TokenResponse)
 async def login(request: Request, login_req: LoginRequest, db: AsyncSession = Depends(get_db)):
     """Authenticate user with email/password and return JWT + user data."""
-    result = await db.execute(select(User).where(User.email == login_req.email))
+    result = await db.execute(select(User).where(func.lower(User.email) == login_req.email.strip().lower()))
     user = result.scalar_one_or_none()
 
     if user is None or not verify_password(login_req.password, user.password):

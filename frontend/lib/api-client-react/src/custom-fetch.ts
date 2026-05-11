@@ -313,6 +313,20 @@ export async function customFetch<T = unknown>(
 
   if (!response.ok) {
     const errorData = await parseErrorBody(response, method);
+
+    // Auto-logout on 401 Unauthorized — clear stale auth and redirect to login
+    if (response.status === 401 && typeof window !== "undefined") {
+      const isLoginRequest = typeof input === "string" && input.includes("/auth/login");
+      if (!isLoginRequest) {
+        window.localStorage.removeItem("token");
+        window.localStorage.removeItem("zainco_user");
+        // Only redirect if not already on the login page
+        if (!window.location.pathname.endsWith("/login")) {
+          window.location.href = "/login";
+        }
+      }
+    }
+
     throw new ApiError(response, errorData, requestInfo);
   }
 

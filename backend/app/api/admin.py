@@ -131,7 +131,7 @@ async def create_student(
 ) -> Any:
     """Create a new student and optionally enroll them in a course."""
     # Check if email exists
-    existing_user = await db.scalar(select(User).where(User.email == req.email))
+    existing_user = await db.scalar(select(User).where(func.lower(User.email) == req.email.strip().lower()))
     if existing_user:
         raise HTTPException(status_code=400, detail="User with this email already exists")
 

@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, field_validator
 
 
 class AdminStatsResponse(BaseModel):
@@ -29,6 +29,14 @@ class CreateStudentRequest(BaseModel):
     license_number: Optional[str] = None
     phone: Optional[str] = None
     course_id: Optional[UUID] = None
+
+    @field_validator("email", mode="before")
+    @classmethod
+    def normalize_email(cls, v: str) -> str:
+        """Strip whitespace and lowercase the email."""
+        if isinstance(v, str):
+            return v.strip().lower()
+        return v
 
 
 class StudentListResponse(BaseModel):
@@ -86,6 +94,14 @@ class EnrollmentInquiryCreate(BaseModel):
     phone: str
     license_number: str
     message: Optional[str] = ""
+
+    @field_validator("email", mode="before")
+    @classmethod
+    def normalize_email(cls, v: str) -> str:
+        """Strip whitespace and lowercase the email."""
+        if isinstance(v, str):
+            return v.strip().lower()
+        return v
 
 
 class EnrollmentInquiryResponse(BaseModel):

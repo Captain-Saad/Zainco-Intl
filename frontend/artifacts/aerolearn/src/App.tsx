@@ -24,7 +24,17 @@ import Enroll from "@/pages/Enroll";
 import NotFound from "@/pages/not-found";
 import InstallBanner from "@/components/shared/InstallBanner";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 30 * 1000,           // Data considered fresh for 30s — prevents duplicate fetches during navigation
+      refetchOnWindowFocus: true,      // Refetch when user tabs back to the app
+      refetchOnMount: 'always',        // Always refetch when a component mounts (fixes stale data on page navigation)
+      refetchOnReconnect: true,        // Refetch when network reconnects
+      retry: 1,                        // Retry once on failure
+    },
+  },
+});
 
 // Route Protection Wrapper
 function ProtectedRoute({ component: Component, adminOnly = false }: { component: any, adminOnly?: boolean }) {

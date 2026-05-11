@@ -25,21 +25,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const storedUser = localStorage.getItem('zainco_user');
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (e) {
-        localStorage.removeItem('zainco_user');
-      }
+    const token = localStorage.getItem('token');
+
+    if (storedUser && token) {
+      // Validate the token is still valid by calling /api/auth/me
+      customFetch<User>('/api/auth/me')
+        .then((validatedUser) => {
+          setUser(validatedUser);
+          // Update stored user with fresh data from server
+          localStorage.setItem('zainco_user', JSON.stringify(validatedUser));
+        })
+        .catch(() => {
+          // Token expired or invalid — clear stale auth state
+          localStorage.removeItem('zainco_user');
+          localStorage.removeItem('token');
+          setUser(null);
+        })
+        .finally(() => setLoading(false));
+    } else {
+      // No stored auth — clear any partial state
+      localStorage.removeItem('zainco_user');
+      localStorage.removeItem('token');
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   const login = async (email: string, password: string) => {
     try {
+      // Normalize email: trim whitespace and lowercase
+      const normalizedEmail = email.trim().toLowerCase();
+
       const response = await customFetch<{ access_token: string; user: User }>('/api/auth/login', {
         method: 'POST',
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: normalizedEmail, password }),
       });
       
       const { access_token, user: newUser } = response;

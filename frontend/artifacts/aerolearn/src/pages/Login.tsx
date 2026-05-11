@@ -56,6 +56,10 @@ export default function Login() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            autoCapitalize="none"
+            autoCorrect="off"
+            autoComplete="email"
+            spellCheck={false}
             className={error ? "border-destructive" : ""}
           />
           <div className="relative">
@@ -66,6 +70,10 @@ export default function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              autoCapitalize="none"
+              autoCorrect="off"
+              autoComplete="current-password"
+              spellCheck={false}
               className={error ? "border-destructive pr-10" : "pr-10"}
             />
             <button

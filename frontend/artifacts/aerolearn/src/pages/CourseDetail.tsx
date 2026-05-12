@@ -57,7 +57,7 @@ export default function CourseDetail() {
   return (
     <div className="min-h-screen bg-background flex">
       <Sidebar />
-      <main className="flex-1 md:ml-64 pb-20 pt-14 md:pt-0">
+      <main className="flex-1 md:ml-64 pb-10 md:pb-20 pt-14 md:pt-0">
         {/* Hero Banner */}
         <div className="h-[220px] md:h-[300px] relative border-b border-border flex items-end">
           <div className="absolute inset-0 bg-secondary">
@@ -77,8 +77,8 @@ export default function CourseDetail() {
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-6 md:px-10 mt-10 grid lg:grid-cols-3 gap-10">
-          <div className="lg:col-span-2 space-y-12">
+        <div className="max-w-7xl mx-auto px-6 md:px-10 mt-6 md:mt-10 grid lg:grid-cols-3 gap-8 md:gap-10">
+          <div className="lg:col-span-2 space-y-8 md:space-y-12">
             <section>
               <h2 className="text-2xl font-display font-semibold mb-4">About This Course</h2>
               <p className="text-muted-foreground leading-relaxed text-lg">{course.description}</p>
@@ -204,10 +204,10 @@ function CurriculumSection({ courseId, totalLessons }: { courseId: string; total
                   return (
                     <div key={item.id} className={`p-4 flex items-center justify-between hover:bg-white/5 transition-colors ${item.is_locked ? 'opacity-50' : ''}`}>
                       <div className="flex items-center gap-4">
-                        <div className="text-muted-foreground font-mono text-xs w-6">{String(i + 1).padStart(2, '0')}</div>
+                        <div className="text-muted-foreground font-mono text-[10px] md:text-xs w-6">{String(i + 1).padStart(2, '0')}</div>
                         {getIcon(item)}
-                        <div>
-                          <span className={`font-medium ${item.completed ? 'text-muted-foreground line-through' : 'text-foreground'}`}>
+                        <div className="min-w-0 flex-1">
+                          <span className={`font-medium text-sm md:text-base block md:inline ${item.completed ? 'text-muted-foreground line-through' : 'text-foreground'}`}>
                             {item.title}
                           </span>
                           <span className={`ml-2 text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border ${

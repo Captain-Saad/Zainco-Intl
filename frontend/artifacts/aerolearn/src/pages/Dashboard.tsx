@@ -90,8 +90,8 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-background flex">
       <Sidebar />
-      <main className="flex-1 md:ml-64 px-4 pt-16 pb-8 md:p-10 max-w-7xl w-full">
-        <header className="mb-8 md:mb-10 flex justify-between items-end">
+      <main className="flex-1 md:ml-64 px-4 pt-6 md:pt-16 pb-8 md:p-10 max-w-7xl w-full">
+        <header className="mb-6 md:mb-10 flex justify-between items-end">
           <div>
             <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground">
               Welcome back, <span className="text-primary">{user?.name?.split(' ')[0]}</span>
@@ -107,7 +107,7 @@ export default function Dashboard() {
           variants={container}
           initial="hidden"
           animate="show"
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8 md:mb-10"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-10"
         >
           <StatCard title="Courses Enrolled" value={totalCourses} icon={BookOpen} />
           <StatCard title="Weekly Hours" value={(totalWeeklyMinutes / 60).toFixed(1)} icon={Clock} />

@@ -368,7 +368,12 @@ export default function SecureVideoPlayer({
     [],
   );
 
-  const handleSurfaceClick = useCallback(() => {
+  const handleSurfaceClick = useCallback((e?: React.MouseEvent | React.TouchEvent) => {
+    // Prevent double-triggering on mobile (if called from touch handler)
+    if (e) {
+      if (e.type === 'touchend') e.preventDefault();
+    }
+    
     const wasPaused = videoRef.current?.paused;
     togglePlay();
     flashClick(wasPaused ? 'play' : 'pause');
@@ -463,7 +468,8 @@ export default function SecureVideoPlayer({
         // Single tap after delay
         setTimeout(() => {
           if (lastTapRef.current.time === now) {
-            handleSurfaceClick();
+            // Use the unified handler with the event to prevent click double-firing
+            handleSurfaceClick(e);
           }
         }, 360);
       }
@@ -619,7 +625,12 @@ export default function SecureVideoPlayer({
 
         {/* ── Transparent overlay (z-5) ── */}
         <div
-          onClick={handleSurfaceClick}
+          onClick={(e) => {
+            // On touch devices, we handle this in handleTouchEnd to avoid delays/doubles
+            // But we keep it here for desktop compatibility.
+            if (window.matchMedia('(pointer: coarse)').matches) return;
+            handleSurfaceClick(e);
+          }}
           onDoubleClick={handleSurfaceDoubleClick}
           style={{
             position: 'absolute',

@@ -94,17 +94,17 @@ export default function Lesson() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Top Bar */}
-      <header className="h-16 bg-card border-b border-border flex items-center px-6 justify-between shrink-0">
-        <div className="flex items-center gap-4">
+      <header className="h-14 md:h-16 bg-card border-b border-border flex items-center px-4 md:px-6 justify-between shrink-0">
+        <div className="flex items-center gap-3 md:gap-4 overflow-hidden">
           <Link href={user?.role === 'admin' ? `/admin/courses/${course.id}` : `/courses/${course.id}`}>
-            <div className="p-2 hover:bg-white/5 rounded cursor-pointer text-muted-foreground hover:text-foreground">
-              <ChevronLeft size={20} />
+            <div className="p-2 hover:bg-white/5 rounded cursor-pointer text-muted-foreground hover:text-foreground shrink-0">
+              <ChevronLeft size={18} />
             </div>
           </Link>
-          <div className="h-6 w-px bg-border" />
-          <span className="text-sm font-mono text-muted-foreground uppercase hidden sm:inline">{course.category}</span>
-          <span className="text-sm font-mono text-muted-foreground hidden sm:inline">/</span>
-          <h1 className="font-display font-bold text-lg">{lesson.title}</h1>
+          <div className="h-6 w-px bg-border shrink-0" />
+          <span className="text-xs font-mono text-muted-foreground uppercase hidden sm:inline">{course.category}</span>
+          <span className="text-xs font-mono text-muted-foreground hidden sm:inline">/</span>
+          <h1 className="font-display font-bold text-base md:text-lg truncate">{lesson.title}</h1>
         </div>
       </header>
 
@@ -135,9 +135,9 @@ export default function Lesson() {
               }
             />
 
-          <div className="p-4 md:p-8 max-w-4xl">
-            <h2 className="text-2xl font-display font-bold mb-6">Instructor Notes</h2>
-            <div className="prose prose-invert max-w-none text-muted-foreground font-sans leading-relaxed whitespace-pre-wrap">
+          <div className="p-6 md:p-8 max-w-4xl">
+            <h2 className="text-xl md:text-2xl font-display font-bold mb-4 md:mb-6">Instructor Notes</h2>
+            <div className="prose prose-invert max-w-none text-muted-foreground font-sans text-sm md:text-base leading-relaxed whitespace-pre-wrap">
               {lesson.content || "No instructor notes available for this lesson."}
             </div>
 
@@ -198,25 +198,25 @@ export default function Lesson() {
                     ${item.is_locked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
                   `}
                 >
-                  <div className="mt-1">
+                   <div className="mt-1 shrink-0">
                     {item.completed ? (
-                      <CheckCircle2 size={18} className="text-primary" />
+                      <CheckCircle2 size={16} className="text-primary" />
                     ) : item.is_locked ? (
-                      <Lock size={18} className="text-muted-foreground" />
+                      <Lock size={16} className="text-muted-foreground" />
                     ) : item.type === 'lesson' ? (
-                      <PlayCircle size={18} className="text-accent" />
+                      <PlayCircle size={16} className="text-accent" />
                     ) : item.type === 'quiz' ? (
-                      <HelpCircle size={18} className="text-green-400" />
+                      <HelpCircle size={16} className="text-green-400" />
                     ) : (
-                      <FileText size={18} className="text-accent" />
+                      <FileText size={16} className="text-accent" />
                     )}
                   </div>
-                  <div>
-                    <p className={`font-medium text-sm leading-tight mb-1 ${isCurrent ? 'text-primary' : 'text-foreground'}`}>{item.title}</p>
-                    <div className="flex items-center gap-2">
-                       <p className="text-xs font-mono text-muted-foreground uppercase">{item.type}</p>
+                  <div className="min-w-0 flex-1">
+                    <p className={`font-medium text-xs md:text-sm leading-tight mb-1 break-words ${isCurrent ? 'text-primary' : 'text-foreground'}`}>{item.title}</p>
+                    <div className="flex flex-wrap items-center gap-2">
+                       <p className="text-[10px] font-mono text-muted-foreground uppercase">{item.type}</p>
                        {item.type === 'quiz' && item.completed && (
-                         <span className={`text-[9px] font-mono px-1 py-0.5 rounded border ${
+                         <span className={`text-[8px] font-mono px-1 py-0.5 rounded border ${
                            item.quiz_status === 'graded' ? 'border-emerald-500/30 text-emerald-400 bg-emerald-500/5' : 'border-amber-500/30 text-amber-400 bg-amber-500/5'
                          }`}>
                            {item.quiz_status === 'graded' ? `${item.quiz_score ?? 0}` : 'REVIEW'}

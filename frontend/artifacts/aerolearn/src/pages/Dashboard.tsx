@@ -90,13 +90,13 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-background flex">
       <Sidebar />
-      <main className="flex-1 md:ml-64 px-4 pt-6 md:pt-16 pb-8 md:p-10 max-w-7xl w-full">
-        <header className="mb-6 md:mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-start gap-4 sm:gap-12">
+      <main className="flex-1 md:ml-64 px-4 pt-20 md:pt-16 pb-8 md:p-10 max-w-7xl w-full">
+        <header className="mb-4 md:mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-start gap-2 sm:gap-12">
           <div>
-            <h1 className="text-2xl md:text-4xl font-display font-bold text-foreground">
+            <h1 className="text-xl md:text-4xl font-display font-bold text-foreground leading-tight">
               Welcome back, <span className="text-primary">{user?.name?.split(' ')[0]}</span>
             </h1>
-            <p className="text-accent font-mono mt-1 flex items-center gap-2 text-[10px] md:text-sm">
+            <p className="text-accent font-mono mt-0.5 flex items-center gap-2 text-[10px] md:text-sm">
               <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse shrink-0" />
               SYSTEMS ONLINE • {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }).toUpperCase()}
             </p>

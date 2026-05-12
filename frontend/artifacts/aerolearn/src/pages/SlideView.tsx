@@ -64,16 +64,16 @@ export default function SlideView() {
       <Sidebar />
       <main className="flex-1 md:ml-64 flex flex-col h-screen overflow-hidden">
         {/* Header */}
-        <header className="h-16 border-b border-white/5 bg-black/40 backdrop-blur-md flex items-center justify-between px-6 z-20">
-          <div className="flex items-center gap-4">
+        <header className="h-16 md:h-20 border-b border-white/5 bg-black/40 backdrop-blur-md flex items-center justify-between px-4 md:px-6 z-20">
+          <div className="flex items-center gap-2 md:gap-4 min-w-0">
             <Link href={`/courses/${params?.courseId}`}>
-              <button className="p-2 hover:bg-white/5 rounded-full transition-colors">
-                <ChevronLeft size={20} />
+              <button className="p-1.5 md:p-2 hover:bg-white/5 rounded-full transition-colors shrink-0">
+                <ChevronLeft size={18} className="md:w-5 md:h-5" />
               </button>
             </Link>
-            <div>
-              <h1 className="text-sm font-semibold tracking-wide uppercase text-accent">{item.title}</h1>
-              <p className="text-[10px] text-muted-foreground font-mono">STUDY MATERIAL • MODULE {params?.itemId?.slice(0,4)?.toUpperCase() || 'REF'}</p>
+            <div className="min-w-0">
+              <h1 className="text-xs md:text-sm font-semibold tracking-wide uppercase text-accent truncate">{item.title}</h1>
+              <p className="text-[9px] md:text-[10px] text-muted-foreground font-mono truncate uppercase">Module {params?.itemId?.slice(0,6) || 'N/A'}</p>
             </div>
           </div>
 
@@ -88,11 +88,11 @@ export default function SlideView() {
         </header>
 
         {/* Viewer Area */}
-        <div className={`flex-1 relative bg-black flex items-center justify-center p-4 md:p-8 ${
+        <div className={`flex-1 relative bg-[#0a0a0a] flex items-center justify-center p-2 md:p-8 ${
             isFullScreen ? 'fixed inset-0 z-[100] p-0 md:p-0' : ''
         }`}>
           <div className={`w-full bg-card border border-white/10 shadow-2xl overflow-hidden relative group transition-all duration-300 ${
-            isFullScreen ? 'max-w-none h-screen rounded-none border-0' : 'max-w-5xl h-full rounded-2xl'
+            isFullScreen ? 'max-w-none h-screen rounded-none border-0' : 'max-w-5xl h-[50vh] md:h-full rounded-xl md:rounded-2xl'
           }`}>
             <div className="absolute top-4 right-4 z-[110] flex gap-2">
                 <Button 

@@ -949,7 +949,7 @@ export default function SecureVideoPlayer({
             </div>
 
             {/* Right controls */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               {/* Speed */}
               <button onClick={cycleSpeed} style={{
                 background: 'rgba(255,255,255,0.1)', border: '0.5px solid rgba(255,255,255,0.2)',
@@ -972,7 +972,7 @@ export default function SecureVideoPlayer({
               </span>
 
               {/* Fullscreen */}
-              <button onClick={toggleFullscreen} style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', color: '#fff', cursor: 'pointer', transition: 'color 0.2s', borderRadius: '4px', minWidth: '44px', minHeight: '44px' }}
+              <button onClick={toggleFullscreen} style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', color: '#fff', cursor: 'pointer', transition: 'color 0.2s', borderRadius: '4px', minWidth: '36px', minHeight: '36px' }}
                 onMouseEnter={(e) => (e.currentTarget.style.color = '#C9A84C')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = '#fff')}
               >

@@ -101,14 +101,14 @@ export default function CourseDetail() {
             <CurriculumSection courseId={course.id} totalLessons={course.total_lessons} />
           </div>
 
-          <div className="space-y-6">
-            <div className="sticky top-24 glass-card p-8 rounded-2xl border-t-4 border-t-primary text-center">
-              <ProgressRing progress={course.progress} size={180} strokeWidth={14}>
-                <span className="text-5xl font-mono text-glow-blue text-accent mb-1">{course.progress}%</span>
-                <span className="text-xs text-muted-foreground uppercase tracking-widest">Completed</span>
-              </ProgressRing>
+          <div className="lg:col-span-1">
+            <div className="relative lg:sticky lg:top-24 space-y-6">
+              <div className="glass-card rounded-xl border border-border p-6 shadow-xl">
+                <ProgressRing progress={course.progress} size={180} strokeWidth={14}>
+                  <span className="text-5xl font-mono text-glow-blue text-accent mb-1">{course.progress}%</span>
+                  <span className="text-xs text-muted-foreground uppercase tracking-widest">Completed</span>
+                </ProgressRing>
               
-              <div className="mt-8 mb-6 space-y-4 text-left">
                 <div className="flex justify-between border-b border-border/50 pb-2">
                   <span className="text-muted-foreground">Instructor</span>
                   <span className="font-semibold">{course.instructor || 'Capt. Zainul Abidin'}</span>

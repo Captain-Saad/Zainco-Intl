@@ -135,6 +135,7 @@ export default function SecureVideoPlayer({
       const tag = (e.target as HTMLElement)?.tagName;
       if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
 
+
       const v = videoRef.current;
       if (!v) return;
 
@@ -207,6 +208,10 @@ export default function SecureVideoPlayer({
     if (playing) {
       hideTimer.current = setTimeout(() => setControlsVisible(false), 3000);
     }
+  }, [playing]);
+
+  const hideControls = useCallback(() => {
+    if (playing) setControlsVisible(false);
   }, [playing]);
 
   useEffect(() => {

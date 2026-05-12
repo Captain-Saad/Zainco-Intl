@@ -108,9 +108,9 @@ export default function Lesson() {
         </div>
       </header>
 
-      <div className="flex-1 flex flex-col lg:flex-row overflow-auto lg:overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden bg-background">
         {/* Main Content (Video) */}
-        <div className="flex-1 flex flex-col relative lg:overflow-y-auto">
+        <div className="flex-none lg:flex-1 flex flex-col relative lg:overflow-y-auto">
             {/* Secure Video Player */}
             <SecureVideoPlayer
               src={videoUrl || ''}
@@ -135,7 +135,7 @@ export default function Lesson() {
               }
             />
 
-          <div className="p-6 md:p-8 max-w-4xl">
+          <div className="p-4 md:p-8 max-w-4xl">
             <h2 className="text-xl md:text-2xl font-display font-bold mb-4 md:mb-6">Instructor Notes</h2>
             <div className="prose prose-invert max-w-none text-muted-foreground font-sans text-sm md:text-base leading-relaxed whitespace-pre-wrap">
               {lesson.content || "No instructor notes available for this lesson."}
@@ -182,9 +182,9 @@ export default function Lesson() {
         </div>
 
         {/* Sidebar Lesson List */}
-        <div className="w-full lg:w-96 bg-card border-t lg:border-t-0 lg:border-l border-border flex flex-col max-h-[50vh] lg:max-h-none lg:h-[calc(100vh-64px)]">
+        <aside className="w-full lg:w-96 bg-card border-t lg:border-t-0 lg:border-l border-border flex flex-col flex-none lg:h-[calc(100vh-64px)]">
           <div className="p-4 border-b border-border font-display font-bold">Curriculum</div>
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 lg:overflow-y-auto bg-background/50">
             {curriculum?.map((item: any) => {
               const isCurrent = item.type === 'lesson' && item.lesson_id === params?.lessonId;
               const link = item.type === 'lesson' ? `/courses/${course.id}/lesson/${item.lesson_id}` : 

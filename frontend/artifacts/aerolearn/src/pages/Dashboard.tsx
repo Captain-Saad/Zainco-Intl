@@ -91,13 +91,13 @@ export default function Dashboard() {
     <div className="min-h-screen bg-background flex">
       <Sidebar />
       <main className="flex-1 md:ml-64 px-4 pt-6 md:pt-16 pb-8 md:p-10 max-w-7xl w-full">
-        <header className="mb-6 md:mb-10 flex justify-between items-end">
+        <header className="mb-6 md:mb-10 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
           <div>
-            <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground">
+            <h1 className="text-2xl md:text-4xl font-display font-bold text-foreground">
               Welcome back, <span className="text-primary">{user?.name?.split(' ')[0]}</span>
             </h1>
-            <p className="text-accent font-mono mt-2 flex items-center gap-2 text-sm">
-              <span className="w-2 h-2 rounded-full bg-accent animate-pulse shrink-0" />
+            <p className="text-accent font-mono mt-1 flex items-center gap-2 text-[10px] md:text-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse shrink-0" />
               SYSTEMS ONLINE • {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }).toUpperCase()}
             </p>
           </div>
@@ -107,7 +107,7 @@ export default function Dashboard() {
           variants={container}
           initial="hidden"
           animate="show"
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-10"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-10"
         >
           <StatCard title="Courses Enrolled" value={totalCourses} icon={BookOpen} />
           <StatCard title="Weekly Hours" value={(totalWeeklyMinutes / 60).toFixed(1)} icon={Clock} />
@@ -116,7 +116,7 @@ export default function Dashboard() {
         </motion.div>
 
         <div className="grid lg:grid-cols-3 gap-6 md:gap-10">
-          <div className="lg:col-span-2 space-y-10">
+          <div className="lg:col-span-2 space-y-6 md:space-y-10">
             {/* Continue Learning */}
             <section>
               <h2 className="text-2xl font-display font-semibold mb-6 flex items-center gap-3">

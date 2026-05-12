@@ -62,11 +62,8 @@ self.addEventListener('fetch', (e) => {
       .catch(() => {
         return caches.match(e.request).then((cachedResponse) => {
           if (cachedResponse) return cachedResponse;
-          // Fallback for failed fetches that aren't in cache
-          return new Response('Network error occurred', {
-            status: 408,
-            headers: { 'Content-Type': 'text/plain' },
-          });
+          // Return a transparent 404 for missing assets
+          return new Response('Not found', { status: 404 });
         });
       })
   );

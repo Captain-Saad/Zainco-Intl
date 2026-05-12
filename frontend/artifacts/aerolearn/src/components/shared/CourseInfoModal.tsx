@@ -27,8 +27,10 @@ export default function CourseInfoModal({ course, onClose }: CourseInfoModalProp
   }, [onClose]);
 
   const getInitials = (name: string) => {
+    if (!name) return "??";
     return name
       .split(" ")
+      .filter(Boolean)
       .map((n) => n[0])
       .join("")
       .toUpperCase();

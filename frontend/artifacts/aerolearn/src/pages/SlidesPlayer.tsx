@@ -1,5 +1,5 @@
 import { useRoute, Link } from "wouter";
-import { ChevronLeft, FileText, CheckCircle2, Lock, PlayCircle, HelpCircle, Download } from "lucide-react";
+import { ChevronLeft, FileText, CheckCircle2, Lock, PlayCircle, HelpCircle, Download, Maximize2 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/shared/Button";
 import { useAuth } from "@/hooks/useAuth";

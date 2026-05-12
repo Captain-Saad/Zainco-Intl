@@ -2,6 +2,7 @@ import { useRoute, Link } from "wouter";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { useQuery } from "@tanstack/react-query";
 import { customFetch } from "@workspace/api-client-react";
+import { useState } from "react";
 import { ChevronLeft, Download, Maximize2, Loader2, FileText } from "lucide-react";
 import { Button } from "@/components/shared/Button";
 
@@ -72,7 +73,7 @@ export default function SlideView() {
             </Link>
             <div>
               <h1 className="text-sm font-semibold tracking-wide uppercase text-accent">{item.title}</h1>
-              <p className="text-[10px] text-muted-foreground font-mono">STUDY MATERIAL • MODULE {params?.itemId?.slice(0,4).toUpperCase()}</p>
+              <p className="text-[10px] text-muted-foreground font-mono">STUDY MATERIAL • MODULE {params?.itemId?.slice(0,4)?.toUpperCase() || 'REF'}</p>
             </div>
           </div>
 

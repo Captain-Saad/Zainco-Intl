@@ -578,8 +578,15 @@ export default function SecureVideoPlayer({
         ref={containerRef}
         onContextMenu={(e) => e.preventDefault()}
         onMouseMove={showControls}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
+        onMouseLeave={hideControls}
+        onTouchStart={(e) => {
+          showControls();
+          handleTouchStart(e);
+        }}
+        onTouchEnd={(e) => {
+          showControls();
+          handleTouchEnd(e);
+        }}
         style={{
           position: 'relative',
           width: '100%',

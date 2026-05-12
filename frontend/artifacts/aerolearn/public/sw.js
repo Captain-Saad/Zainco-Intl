@@ -48,15 +48,27 @@ self.addEventListener('fetch', (e) => {
 
   // Regular asset requests: Network-first (ensures new deployments are picked up)
   // Falls back to cache only when offline
+  // Regular asset requests: Network-first
   e.respondWith(
     fetch(e.request)
       .then((response) => {
-        // Update the cache with the fresh response
-        const clone = response.clone();
-        caches.open(CACHE).then((cache) => cache.put(e.request, clone));
+        // Only cache valid responses
+        if (response && response.status === 200) {
+          const clone = response.clone();
+          caches.open(CACHE).then((cache) => cache.put(e.request, clone));
+        }
         return response;
       })
-      .catch(() => caches.match(e.request))
+      .catch(() => {
+        return caches.match(e.request).then((cachedResponse) => {
+          if (cachedResponse) return cachedResponse;
+          // Fallback for failed fetches that aren't in cache
+          return new Response('Network error occurred', {
+            status: 408,
+            headers: { 'Content-Type': 'text/plain' },
+          });
+        });
+      })
   );
 });
 

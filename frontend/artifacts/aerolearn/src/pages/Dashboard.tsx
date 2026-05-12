@@ -91,7 +91,7 @@ export default function Dashboard() {
     <div className="min-h-screen bg-background flex">
       <Sidebar />
       <main className="flex-1 md:ml-64 px-4 pt-6 md:pt-16 pb-8 md:p-10 max-w-7xl w-full">
-        <header className="mb-6 md:mb-10 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+        <header className="mb-6 md:mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-start gap-4 sm:gap-12">
           <div>
             <h1 className="text-2xl md:text-4xl font-display font-bold text-foreground">
               Welcome back, <span className="text-primary">{user?.name?.split(' ')[0]}</span>

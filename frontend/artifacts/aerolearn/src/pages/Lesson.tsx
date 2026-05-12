@@ -237,7 +237,7 @@ export default function Lesson() {
               );
             })}
           </div>
-        </div>
+        </aside>
       </div>
     </div>
   );

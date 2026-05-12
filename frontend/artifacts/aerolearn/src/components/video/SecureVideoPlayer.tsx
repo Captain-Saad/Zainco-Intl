@@ -822,7 +822,7 @@ export default function SecureVideoPlayer({
             left: 0,
             right: 0,
             background: 'linear-gradient(transparent, rgba(0,0,0,0.85))',
-            padding: '48px 16px 14px',
+            padding: '48px 12px 10px',
             zIndex: 20,
             opacity: controlsVisible ? 1 : 0,
             transition: 'opacity 0.4s ease',
@@ -893,9 +893,9 @@ export default function SecureVideoPlayer({
           {/* Row 2: Buttons */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             {/* Left controls */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div className="flex items-center gap-1 sm:gap-2">
               {/* Play/Pause */}
-              <button onClick={togglePlay} style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', color: '#fff', cursor: 'pointer', transition: 'color 0.2s, transform 0.15s', borderRadius: '4px', minWidth: '44px', minHeight: '44px' }}
+              <button onClick={togglePlay} style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', color: '#fff', cursor: 'pointer', transition: 'color 0.2s, transform 0.15s', borderRadius: '4px', minWidth: '36px', minHeight: '36px' }}
                 onMouseEnter={(e) => (e.currentTarget.style.color = '#C9A84C')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = '#fff')}
               >
@@ -903,7 +903,7 @@ export default function SecureVideoPlayer({
               </button>
 
               {/* Skip back 10 */}
-              <button onClick={() => { const v = videoRef.current; if (v) v.currentTime = Math.max(0, v.currentTime - 10); }} style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', color: '#fff', cursor: 'pointer', transition: 'color 0.2s', borderRadius: '4px', minWidth: '44px', minHeight: '44px' }}
+              <button onClick={() => { const v = videoRef.current; if (v) v.currentTime = Math.max(0, v.currentTime - 10); }} className="hidden sm:flex" style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', color: '#fff', cursor: 'pointer', transition: 'color 0.2s', borderRadius: '4px', minWidth: '36px', minHeight: '36px' }}
                 onMouseEnter={(e) => (e.currentTarget.style.color = '#C9A84C')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = '#fff')}
               >
@@ -911,16 +911,17 @@ export default function SecureVideoPlayer({
               </button>
 
               {/* Skip forward 10 */}
-              <button onClick={() => { const v = videoRef.current; if (v) v.currentTime = Math.min(v.duration || 0, v.currentTime + 10); }} style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', color: '#fff', cursor: 'pointer', transition: 'color 0.2s', borderRadius: '4px', minWidth: '44px', minHeight: '44px' }}
+              <button onClick={() => { const v = videoRef.current; if (v) v.currentTime = Math.min(v.duration || 0, v.currentTime + 10); }} className="hidden sm:flex" style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', color: '#fff', cursor: 'pointer', transition: 'color 0.2s', borderRadius: '4px', minWidth: '36px', minHeight: '36px' }}
                 onMouseEnter={(e) => (e.currentTarget.style.color = '#C9A84C')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = '#fff')}
               >
                 <SkipForwardIcon />
               </button>
 
-              {/* Volume */}
+              {/* Volume - hidden on mobile */}
               <div
-                style={{ position: 'relative', display: 'flex', alignItems: 'center' }}
+                className="hidden sm:flex"
+                style={{ position: 'relative', alignItems: 'center' }}
                 onMouseEnter={() => setShowVolSlider(true)}
                 onMouseLeave={() => setShowVolSlider(false)}
               >
@@ -942,14 +943,18 @@ export default function SecureVideoPlayer({
                 )}
               </div>
 
-              {/* Time */}
-              <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '13px', color: 'rgba(255,255,255,0.85)', marginLeft: '8px', whiteSpace: 'nowrap' }}>
+              {/* Time - hidden on very small screens */}
+              <span className="hidden sm:inline" style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '13px', color: 'rgba(255,255,255,0.85)', marginLeft: '8px', whiteSpace: 'nowrap' }}>
                 {fmt(currentTime)} / {fmt(duration)}
+              </span>
+              {/* Compact time for mobile */}
+              <span className="sm:hidden" style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '10px', color: 'rgba(255,255,255,0.7)', marginLeft: '4px', whiteSpace: 'nowrap' }}>
+                {fmt(currentTime)}
               </span>
             </div>
 
             {/* Right controls */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               {/* Speed */}
               <button onClick={cycleSpeed} style={{
                 background: 'rgba(255,255,255,0.1)', border: '0.5px solid rgba(255,255,255,0.2)',
@@ -962,8 +967,8 @@ export default function SecureVideoPlayer({
                 {SPEEDS[speedIdx]}×
               </button>
 
-              {/* HD badge */}
-              <span style={{
+              {/* HD badge - hidden on mobile */}
+              <span className="hidden sm:inline-block" style={{
                 background: 'rgba(255,255,255,0.1)', border: '0.5px solid rgba(14,165,233,0.4)',
                 color: '#0EA5E9', fontSize: '12px', padding: '3px 8px', borderRadius: '4px',
                 fontFamily: 'JetBrains Mono, monospace',
@@ -972,7 +977,7 @@ export default function SecureVideoPlayer({
               </span>
 
               {/* Fullscreen */}
-              <button onClick={toggleFullscreen} style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', color: '#fff', cursor: 'pointer', transition: 'color 0.2s', borderRadius: '4px', minWidth: '36px', minHeight: '36px' }}
+              <button onClick={toggleFullscreen} style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', color: '#fff', cursor: 'pointer', transition: 'color 0.2s', borderRadius: '4px', minWidth: '44px', minHeight: '44px' }}
                 onMouseEnter={(e) => (e.currentTarget.style.color = '#C9A84C')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = '#fff')}
               >

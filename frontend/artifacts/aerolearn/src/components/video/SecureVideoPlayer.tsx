@@ -341,12 +341,16 @@ export default function SecureVideoPlayer({
     });
   }, []);
 
-  const toggleFullscreen = useCallback(() => {
+  const toggleFullscreen = useCallback(async () => {
     if (!containerRef.current) return;
     if (document.fullscreenElement) {
       document.exitFullscreen();
+      // Unlock orientation when exiting fullscreen
+      try { (screen.orientation as any)?.unlock?.(); } catch {}
     } else {
-      containerRef.current.requestFullscreen();
+      await containerRef.current.requestFullscreen();
+      // Try to rotate to landscape on mobile
+      try { await (screen.orientation as any)?.lock?.('landscape'); } catch {}
     }
   }, []);
 
@@ -470,11 +474,16 @@ export default function SecureVideoPlayer({
         lastTapRef.current = { time: 0, x: 0 };
       } else {
         lastTapRef.current = { time: now, x: t.clientX };
-        // Single tap after delay
+        // Single tap: just toggle controls visibility on mobile (don't play/pause)
+        // Users should use the play button to play/pause
         setTimeout(() => {
           if (lastTapRef.current.time === now) {
-            // Use the unified handler with the event to prevent click double-firing
-            handleSurfaceClick(e);
+            // Toggle controls instead of play/pause
+            if (controlsVisible) {
+              setControlsVisible(false);
+            } else {
+              showControls();
+            }
           }
         }, 360);
       }

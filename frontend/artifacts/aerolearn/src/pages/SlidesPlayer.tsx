@@ -45,35 +45,35 @@ export default function SlidesPlayer() {
   if (!currentItem) return <div className="text-center mt-20">Slides Not Found</div>;
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      {/* Top Bar */}
-      <header className="h-16 bg-card border-b border-border flex items-center px-6 justify-between shrink-0">
-        <div className="flex items-center gap-4">
+    <div className="min-h-screen min-h-[100dvh] bg-background flex flex-col">
+      {/* Top Bar - stacked on mobile */}
+      <header className="bg-card border-b border-border shrink-0 px-3 md:px-6 py-2 md:py-0 md:h-16 md:flex md:items-center md:justify-between">
+        <div className="flex items-center gap-2 md:gap-4 min-w-0 mb-2 md:mb-0">
           <Link href={`/courses/${params?.courseId}`}>
-            <div className="p-2 hover:bg-white/5 rounded cursor-pointer text-muted-foreground hover:text-foreground">
-              <ChevronLeft size={20} />
+            <div className="p-1.5 md:p-2 hover:bg-white/5 rounded cursor-pointer text-muted-foreground hover:text-foreground shrink-0">
+              <ChevronLeft size={18} />
             </div>
           </Link>
-          <div className="h-6 w-px bg-border" />
-          <h1 className="font-display font-bold text-lg">{currentItem.title}</h1>
-          <span className="ml-2 px-2 py-0.5 rounded border border-accent/30 text-accent text-[10px] uppercase tracking-widest font-mono">Slides</span>
+          <h1 className="font-display font-bold text-sm md:text-lg truncate min-w-0">{currentItem.title}</h1>
+          <span className="px-1.5 py-0.5 rounded border border-accent/30 text-accent text-[9px] md:text-[10px] uppercase tracking-widest font-mono shrink-0">Slides</span>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-2 pl-8 md:pl-0">
           {currentItem.slides_url && (
             <a href={currentItem.slides_url} download target="_blank" rel="noopener noreferrer">
-              <Button variant="ghost" size="sm" className="gap-2">
-                <Download size={16} /> Download
+              <Button variant="ghost" size="sm" className="gap-1.5 text-xs h-8 px-2 md:px-3">
+                <Download size={14} />
+                <span className="hidden sm:inline">Download</span>
               </Button>
             </a>
           )}
           {nextItem && isCompleted && (
-            <Button onClick={handleContinue} className="gap-2">
-               Continue <CheckCircle2 size={16} />
+            <Button onClick={handleContinue} size="sm" className="gap-1.5 text-xs h-8">
+               Continue <CheckCircle2 size={14} />
             </Button>
           )}
           {!isCompleted && (
-             <Button onClick={() => completeSlides()} variant="secondary" size="sm" className="gap-2">
-                <CheckCircle2 size={16} /> Mark as Complete
+             <Button onClick={() => completeSlides()} variant="secondary" size="sm" className="gap-1.5 text-xs h-8 px-2 md:px-3">
+                <CheckCircle2 size={14} /> <span className="hidden sm:inline">Mark as</span> Complete
              </Button>
           )}
         </div>
@@ -81,20 +81,20 @@ export default function SlidesPlayer() {
 
       <div className="flex-1 flex flex-col lg:flex-row overflow-auto lg:overflow-hidden">
         {/* Main Content (Slides Viewer) */}
-        <div className={`flex-1 flex flex-col bg-secondary/20 p-4 md:p-8 relative lg:overflow-y-auto items-center justify-center ${
+        <div className={`flex-none lg:flex-1 flex flex-col bg-secondary/20 p-2 md:p-8 relative lg:overflow-y-auto items-center justify-center ${
           isFullScreen ? 'fixed inset-0 z-[100] bg-black p-0 md:p-0' : ''
         }`}>
           <div className={`w-full max-w-5xl bg-card border border-border shadow-2xl overflow-hidden flex flex-col transition-all duration-300 ${
-            isFullScreen ? 'max-w-none h-screen rounded-none border-0' : 'aspect-[4/3] rounded-2xl'
+            isFullScreen ? 'max-w-none h-full rounded-none border-0' : 'aspect-[4/3] rounded-xl md:rounded-2xl'
           }`}>
-            <div className="absolute top-4 right-4 z-[110] flex gap-2">
+            <div className="absolute top-2 right-2 md:top-4 md:right-4 z-[110] flex gap-2">
                 <Button 
                     variant="secondary" 
                     size="icon" 
-                    className="bg-black/40 hover:bg-black/60 backdrop-blur-md border-white/10"
+                    className="bg-black/40 hover:bg-black/60 backdrop-blur-md border-white/10 w-8 h-8 md:w-10 md:h-10"
                     onClick={() => setIsFullScreen(!isFullScreen)}
                 >
-                    <Maximize2 size={18} className={isFullScreen ? 'rotate-180' : ''} />
+                    <Maximize2 size={16} className={isFullScreen ? 'rotate-180' : ''} />
                 </Button>
             </div>
             {currentItem.slides_url ? (
@@ -115,23 +115,20 @@ export default function SlidesPlayer() {
                 <div className="flex-1 flex flex-col items-center justify-center space-y-4">
                     <FileText size={64} className="text-muted-foreground opacity-20" />
                     <p className="text-muted-foreground font-mono">NO SLIDES FILE ATTACHED</p>
-                    <Button variant="ghost" className="gap-2">
-                        <Download size={16} /> Request File
-                    </Button>
                 </div>
             )}
           </div>
           
-          <div className="mt-8 p-6 glass-card rounded-xl border border-border max-w-5xl w-full">
-            <h3 className="font-display font-bold text-lg mb-2">Instructor Notes</h3>
-            <p className="text-muted-foreground leading-relaxed">
+          <div className="mt-4 md:mt-8 p-4 md:p-6 glass-card rounded-xl border border-border max-w-5xl w-full">
+            <h3 className="font-display font-bold text-base md:text-lg mb-2">Instructor Notes</h3>
+            <p className="text-muted-foreground leading-relaxed text-sm">
                 Review these slides thoroughly before proceeding to the next quiz. You can download the full PDF version from the Resources tab if available.
             </p>
           </div>
         </div>
 
         {/* Sidebar */}
-        <div className="w-full lg:w-96 bg-card border-t lg:border-t-0 lg:border-l border-border flex flex-col max-h-[50vh] lg:max-h-none lg:h-[calc(100vh-64px)]">
+        <div className="w-full lg:w-96 bg-card border-t lg:border-t-0 lg:border-l border-border flex flex-col flex-none lg:h-[calc(100vh-64px)]">
           <div className="p-4 border-b border-border font-display font-bold">Curriculum</div>
           <div className="flex-1 overflow-y-auto">
             {curriculum?.map((item: any) => {
